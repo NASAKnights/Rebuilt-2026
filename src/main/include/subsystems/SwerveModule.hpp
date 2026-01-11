@@ -21,7 +21,7 @@ class SwerveModule : public frc2::SubsystemBase
 {
 public:
   SwerveModule(int driveMotorId, int steerMotorId, int steerEncoderId,
-               frc::Rotation2d angleOffset);
+               frc::Rotation2d angleOffset, ctre::phoenix6::CANBus _canBus);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.

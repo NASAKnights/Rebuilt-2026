@@ -22,13 +22,13 @@ using namespace ctre::phoenix6;
 using namespace ModuleConstants;
 
 SwerveModule::SwerveModule(int driveMotorID, int steerMotorID,
-                           int steerEncoderId, frc::Rotation2d angleOffset)
-    : m_id{driveMotorID / 10}, m_driveMotor{driveMotorID, "NKCANivore"},
+                           int steerEncoderId, frc::Rotation2d angleOffset, ctre::phoenix6::CANBus _canBus)
+    : m_id{driveMotorID / 10}, m_driveMotor{driveMotorID, _canBus},
       // : m_id{driveMotorID / 10}, m_driveMotor{driveMotorID}, // uncomment if there is no CANivore being utilized
-      m_steerMotor{steerMotorID, "NKCANivore"},
+      m_steerMotor{steerMotorID, _canBus},
       // m_steerMotor{steerMotorID}, // uncomment if there is no CANivore being utilized
 
-      m_steerEncoder{steerEncoderId, "NKCANivore"},
+      m_steerEncoder{steerEncoderId, _canBus},
       // m_steerEncoder{steerEncoderId}, // uncomment if there is no CANivore being utilized
       m_angleOffset{angleOffset},
       m_driveSim("TalonFX", driveMotorID), m_steerSim("TalonFX", steerMotorID)

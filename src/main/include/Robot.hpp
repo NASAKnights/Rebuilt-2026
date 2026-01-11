@@ -14,6 +14,8 @@
 #include <frc/AnalogInput.h>
 #include "utils/POIGenerator.h"
 
+#include <ctre/phoenix6/CANBus.hpp>
+
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/CommandScheduler.h>
 #include <frc2/command/InstantCommand.h>
@@ -79,7 +81,9 @@ private:
     frc::SendableChooser<std::string> m_chooser;
     frc::AnalogInput batteryShunt{0};
 
-    SwerveDrive m_swerveDrive;
+    ctre::phoenix6::CANBus NKCANBus{"NKCANivore"};
+    ctre::phoenix6::CANBus RioCANBus{"rio"};
+    SwerveDrive m_swerveDrive{NKCANBus};
     // Wrist m_wrist;
     // Elevator m_elevator;
     // Climber m_climber;

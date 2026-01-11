@@ -2,23 +2,25 @@
 
 #include "subsystems/SwerveDrive.hpp"
 
-SwerveDrive::SwerveDrive()
-    : modules{{SwerveModule(ElectricalConstants::kFrontLeftDriveMotorID,
+SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
+    : m_canBus{canBus}, 
+    modules{{SwerveModule(ElectricalConstants::kFrontLeftDriveMotorID,
                             ElectricalConstants::kFrontLeftTurnMotorID,
                             ElectricalConstants::kFrontLeftEncoderID,
-                            DriveConstants::kFrontLeftOffset),
+                            DriveConstants::kFrontLeftOffset, m_canBus),
                SwerveModule(ElectricalConstants::kFrontRightDriveMotorID,
                             ElectricalConstants::kFrontRightTurnMotorID,
                             ElectricalConstants::kFrontRightEncoderID,
-                            DriveConstants::kFrontRightOffset),
+                            DriveConstants::kFrontRightOffset, m_canBus),
                SwerveModule(ElectricalConstants::kBackLeftDriveMotorID,
                             ElectricalConstants::kBackLeftTurnMotorID,
                             ElectricalConstants::kBackLeftEncoderID,
-                            DriveConstants::kBackLeftOffset),
+                            DriveConstants::kBackLeftOffset, m_canBus),
                SwerveModule(ElectricalConstants::kBackRightDriveMotorID,
                             ElectricalConstants::kBackRightTurnMotorID,
                             ElectricalConstants::kBackRightEncoderID,
-                            DriveConstants::kBackRightOffset)}},
+                            DriveConstants::kBackRightOffset, m_canBus)}},
+        m_pigeon{2, m_canBus},
       kSwerveKinematics{{DriveConstants::kFrontLeftPosition, DriveConstants::kFrontRightPosition,
                          DriveConstants::kBackLeftPosition, DriveConstants::kBackRightPosition}},
       pidX{0.9, 1e-4, 0}, pidY{0.9, 1e-4, 0}, pidRot{0.15, 0, 0}, networkTableInst(nt::NetworkTableInstance::GetDefault()), m_poseEstimator{kSwerveKinematics,
@@ -42,7 +44,7 @@ SwerveDrive::SwerveDrive()
     // degrees_t x_deg = degrees_t{x} (Psuedo code)
 
     // navx.Calibrate();
-    navx.Reset();
+    // navx.Reset();
 
     speeds = frc::ChassisSpeeds();
     networkTableInst.StartServer();

@@ -8,6 +8,7 @@
 #include <ctre/phoenix6/Pigeon2.hpp>
 #include <ctre/phoenix6/sim/Pigeon2SimState.hpp>
 #include <ctre/phoenix6/StatusSignal.hpp>
+#include <ctre/phoenix6/CANBus.hpp>
 #include <frc/RobotBase.h>
 #include <frc/SPI.h>
 #include <frc/controller/PIDController.h>
@@ -59,7 +60,7 @@
 class SwerveDrive : public frc2::SubsystemBase
 {
 public:
-  SwerveDrive();
+  SwerveDrive(ctre::phoenix6::CANBus canBus);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -109,12 +110,12 @@ public:
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  // studica::AHRS m_gyro{frc::SPI::Port::kMXP};
-  studica::AHRS navx{studica::AHRS::NavXComType::kMXP_SPI};
+  // studica::AHRS navx{studica::AHRS::NavXComType::kMXP_SPI};
 
+  ctre::phoenix6::CANBus m_canBus;
   // ctre::phoenix6::hardware::Pigeon2 m_pigeon{2};
-  ctre::phoenix6::hardware::Pigeon2 m_pigeon{2, "NKCANivore"};
-  // ctre::phoenix6::hardware::Pigeon2 m_pigeon{2};
+  // ctre::phoenix6::hardware::Pigeon2 m_pigeon{2, canBus}
+  ctre::phoenix6::hardware::Pigeon2 m_pigeon;
 
   std::array<SwerveModule, 4> modules;
   frc::SwerveDriveKinematics<4U> kSwerveKinematics;
