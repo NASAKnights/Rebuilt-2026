@@ -49,6 +49,8 @@
 #include <pathplanner/lib/config/RobotConfig.h>
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 
+#include <photon/PhotonCamera.h>
+
 #include <units/angle.h>
 #include <units/time.h>
 #include <units/angular_velocity.h>
@@ -139,6 +141,8 @@ private:
   frc::ChassisSpeeds priorSpeeds = frc::ChassisSpeeds();
 
   nt::NetworkTableInstance networkTableInst;
+  
+  photon::PhotonCamera jetsonCamera{"photonvison"};
 
   std::string_view baseLink1 = "base_link_1";
   std::string_view baseLink2 = "base_link_2";

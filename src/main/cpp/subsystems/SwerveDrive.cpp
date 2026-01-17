@@ -331,6 +331,40 @@ void SwerveDrive::SetReference(frc::Pose2d desiredPose)
 
 void SwerveDrive::UpdatePoseEstimate()
 {
+
+    // frc::AprilTagFieldLayout kTagLayout{
+    //     frc::LoadAprilTagLayoutField(frc::AprilTagField::k2025ReefscapeAndyMark)
+    // };
+    
+    auto results = jetsonCamera.GetAllUnreadResults();
+    for (auto &result : results) {
+        auto multiTagResult = result.MultiTagResult();
+        if (multiTagResult.has_value()) {
+            frc::Transform3d fieldToCamera = multiTagResult->estimatedPose.best;
+        }
+    }
+    // if (!results.empty()){
+    //     auto bestTarget = results.;
+    //     frc::Transform3d camera2tag = bestTarget.GetBestCameraToTarget();
+    //     frc::Pose3d field2tag = kTagLayout.GetTagPose(bestTarget.GetFiducialId()).value();
+        
+    //     frc::SmartDashboard::PutNumber("Camera2TagX",camera2tag.X().value());
+    //     frc::SmartDashboard::PutNumber("Field2TagX", field2tag.X().value());
+    // }
+
+   
+    // auto visionEst = m_poseEstimator.GetEstimatedPosition();
+
+    // photon::PhotonUtils::EstimateFieldToRobot();
+
+    // double yaw = target.GetYaw();
+    // double pitch = target.GetPitch();
+    // double area = target.GetArea();
+    // double skew = target.GetSkew();
+    // frc::Transform2d pose = 
+    // wpi::SmallVector<std::pair</*TODO: what is needed here?*/> corners = target.GetCorners();
+
+
     auto result1 = baseLink1Subscribe.GetAtomic();
     auto result2 = baseLink2Subscribe.GetAtomic();
     auto resultStdDev = visionStdDevSub.GetAtomic();
