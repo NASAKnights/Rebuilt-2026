@@ -341,6 +341,8 @@ void SwerveDrive::UpdatePoseEstimate()
         auto multiTagResult = result.MultiTagResult();
         if (multiTagResult.has_value()) {
             frc::Transform3d fieldToCamera = multiTagResult->estimatedPose.best;
+
+            frc::SmartDashboard::PutNumber("Camera2TagX",fieldToCamera.X().value());
         }
     }
     // if (!results.empty()){
@@ -348,7 +350,7 @@ void SwerveDrive::UpdatePoseEstimate()
     //     frc::Transform3d camera2tag = bestTarget.GetBestCameraToTarget();
     //     frc::Pose3d field2tag = kTagLayout.GetTagPose(bestTarget.GetFiducialId()).value();
         
-    //     frc::SmartDashboard::PutNumber("Camera2TagX",camera2tag.X().value());
+        // frc::SmartDashboard::PutNumber("Camera2TagX",camera2tag.X().value());
     //     frc::SmartDashboard::PutNumber("Field2TagX", field2tag.X().value());
     // }
 
