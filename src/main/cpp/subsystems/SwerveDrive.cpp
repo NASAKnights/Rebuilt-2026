@@ -335,7 +335,6 @@ void SwerveDrive::UpdatePoseEstimate()
     // frc::AprilTagFieldLayout kTagLayout{
     //     frc::LoadAprilTagLayoutField(frc::AprilTagField::k2025ReefscapeAndyMark)
     // };
-    
     auto results = jetsonCamera.GetAllUnreadResults();
     for (auto &result : results) {
         auto multiTagResult = result.MultiTagResult();
@@ -345,14 +344,6 @@ void SwerveDrive::UpdatePoseEstimate()
             frc::SmartDashboard::PutNumber("Camera2TagX",fieldToCamera.X().value());
         }
     }
-    // if (!results.empty()){
-    //     auto bestTarget = results.;
-    //     frc::Transform3d camera2tag = bestTarget.GetBestCameraToTarget();
-    //     frc::Pose3d field2tag = kTagLayout.GetTagPose(bestTarget.GetFiducialId()).value();
-        
-        // frc::SmartDashboard::PutNumber("Camera2TagX",camera2tag.X().value());
-    //     frc::SmartDashboard::PutNumber("Field2TagX", field2tag.X().value());
-    // }
 
    
     // auto visionEst = m_poseEstimator.GetEstimatedPosition();

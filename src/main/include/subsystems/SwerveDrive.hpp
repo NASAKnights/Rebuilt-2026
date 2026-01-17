@@ -50,6 +50,7 @@
 #include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 
 #include <photon/PhotonCamera.h>
+#include <photon/PhotonPoseEstimator.h>
 
 #include <units/angle.h>
 #include <units/time.h>
@@ -141,8 +142,12 @@ private:
   frc::ChassisSpeeds priorSpeeds = frc::ChassisSpeeds();
 
   nt::NetworkTableInstance networkTableInst;
+
+  frc::AprilTagFieldLayout kTagLayout{
+    frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::kDefaultField)};
   
-  photon::PhotonCamera jetsonCamera{"photonvison"};
+  photon::PhotonCamera jetsonCamera{"Arducam_B0495_camera1"};
+  photon::PhotonPoseEstimator pvPoseEstimation{kTagLayout, frc::Transform3d{}};
 
   std::string_view baseLink1 = "base_link_1";
   std::string_view baseLink2 = "base_link_2";
