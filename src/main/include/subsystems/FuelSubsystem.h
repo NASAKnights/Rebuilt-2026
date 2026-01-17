@@ -21,14 +21,14 @@ class FuelSubsystem : public frc2::SubsystemBase {
   void eject();
   void launch();
   void stop();
-  void spinup();
+  void spinUp();
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
-  rev::SparkMax intakeMotor{1, rev::Motortype::kBrushless};
-  rev::SparkMax feederMotor{2, rev::Motortype::kBrushless};
+  rev::SparkMax intakeMotor{1, rev::Motortype::kBrushed};
+  rev::SparkMax feederMotor{2, rev::Motortype::kBrushed};
 
 
 };

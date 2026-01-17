@@ -16,20 +16,17 @@ void FuelSubsystem::stop() {
     feederMotor.Set(0);
 
 }
-void FuelSubsystem::intake() {
- intakeLauncherRoller.setVoltage(SmartDashboard.getnumber(Intaking intake roller value, Intaking_intake_voltage));
-
-    feederMotor.setVoltage(SmartDashboard.getnumber(Intaking feeder roller value, Intaking_feeder_voltage));
-}
+void FuelSubsystem::intake() { intakeMotor.set(-12);
+    feederMotor.set(10);}
 void FuelSubsystem::eject() {
-    intakeLauncherRoller.setVoltage(-1*SmartDashboard.getnumber("Intaking intake roller value", Intaking_intake_voltage));
-    feederMotor.setVoltage(-1*SmartDashboard.getnumber("Intaking feeder roller value", Intaking_feeder_voltage));
+    intakeMotor.set(10);
+    feederMotor.set(-12);
 }
 void FuelSubsystem::launch() {
-    feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", LAUNCHING_FEEDER_VOLTAGE));
-    intakeLauncherRoller.setVoltage(SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
+    feederMotor.set(9);
+    intakeMotor.set(10.6);
 }
-void FuwlSubsystem::spinUp() {
-    feederRoller.setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE));
-    intakeLauncherRoller.setVoltage(SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_VOLTAGE));
+void FuelSubsystem::spinUp() {
+    feederMotor.setVoltage(-6);
+    intakeMotor.set(10.6);
 }
