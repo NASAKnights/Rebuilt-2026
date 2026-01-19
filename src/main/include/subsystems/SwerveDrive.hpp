@@ -160,6 +160,7 @@ private:
   nt::DoubleArraySubscriber baseLink1Subscribe;
   nt::DoubleArraySubscriber baseLink2Subscribe;
   nt::DoubleArraySubscriber visionStdDevSub;
+  nt::StructPublisher<frc::Transform3d> posePublisher;
   PoseFilter poseFilter1 = PoseFilter(5, 0.2, 0.2);
   PoseFilter poseFilter2 = PoseFilter(5, 0.2, 0.2);
   frc::Quaternion rotation_q; // w, x, y, z

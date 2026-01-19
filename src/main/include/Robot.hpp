@@ -13,6 +13,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/AnalogInput.h>
 #include "utils/POIGenerator.h"
+#include <photon/PhotonUtils.h>
 
 #include <ctre/phoenix6/CANBus.hpp>
 

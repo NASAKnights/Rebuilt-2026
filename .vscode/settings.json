@@ -19,6 +19,8 @@
     "expected": "cpp",
     "optional": "cpp",
     "system_error": "cpp",
-    "regex": "cpp"
+    "regex": "cpp",
+    "any": "cpp",
+    "ranges": "cpp"
   }
 }

@@ -65,6 +65,8 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
 
     baseLinkPublisher = poseTable->GetDoubleArrayTopic(baseLink).Publish();
     timePublisher = poseTable->GetDoubleArrayTopic(timeLinkName).Publish();
+    // timePublisher = poseTable->GetDoubleArrayTopic(timeLinkName).Publish();
+    posePublisher = poseTable->GetStructTopic<frc::Transform3d>("TestPose").Publish();
 
     SetOffsets();
 
@@ -150,10 +152,7 @@ void SwerveDrive::Periodic()
     // sensor fusion? EKF (eek kinda fun) (extended Kalman filter)
 
     PublishOdometry(m_poseEstimator.GetEstimatedPosition());
-    if (useVision)
-    {
-        UpdatePoseEstimate();
-    }
+    UpdatePoseEstimate();
     m_poseEstimator.Update(m_pigeon.GetRotation2d(), GetModulePositions());
     m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
 
@@ -331,15 +330,22 @@ void SwerveDrive::SetReference(frc::Pose2d desiredPose)
 
 void SwerveDrive::UpdatePoseEstimate()
 {
-
     // frc::AprilTagFieldLayout kTagLayout{
     //     frc::LoadAprilTagLayoutField(frc::AprilTagField::k2025ReefscapeAndyMark)
     // };
     auto results = jetsonCamera.GetAllUnreadResults();
     for (auto &result : results) {
         auto multiTagResult = result.MultiTagResult();
+        auto singleTagResult = result.GetBestTarget();
         if (multiTagResult.has_value()) {
             frc::Transform3d fieldToCamera = multiTagResult->estimatedPose.best;
+            posePublisher.Set(fieldToCamera);
+
+            frc::SmartDashboard::PutNumber("Camera2TagX",fieldToCamera.X().value());
+        }
+        else if (result.HasTargets()) {
+            frc::Transform3d fieldToCamera = singleTagResult.GetBestCameraToTarget();
+            posePublisher.Set(fieldToCamera);
 
             frc::SmartDashboard::PutNumber("Camera2TagX",fieldToCamera.X().value());
         }
