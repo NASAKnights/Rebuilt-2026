@@ -1,31 +1,32 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #include "commands/eject.h"
 
-eject::eject(FuelSubsystem fuelSystem) {AddRequirements(fuelSystem)
-  this.FuelSubsystem=fuelSystem;
-  // Use addRequirements() here to declare subsystem dependencies.
+#include <frc/smartdashboard/SmartDashboard.h>
+
+#include "Constants.h"
+
+using namespace Constants;
+
+eject::eject(FuelSubsystem* fuelSubsystem)
+  {
+  AddRequirements({fuelSubsystem});
 }
 
-// Called when the command is initially scheduled.
 void eject::Initialize() {
-  FuelSubsystem.setintakeMotor(-10);
-  FuelSubsystem.setfeedermotor(12);
+  FuelSubsystem Set.IntakeLauncherRoller(-1 * frc::SmartDashboard::GetNumber("Intaking intake roller value",INTAKING_INTAKE_VOLTAGE))
+
+  FuelSubsystem Set.FeederRoller(-1 * frc::SmartDashboard::GetNumber("Intaking feeder roller value",INTAKING_FEEDER_VOLTAGE));
 }
 
-// Called repeatedly when this Command is scheduled to run
 void eject::Execute() {
-  }
 
-// Called once the command ends or is interrupted.
-void eject::End(bool interrupted) {
-   FuelSubsystem.setIntakemotor(0);
-   FuelSubsystem.setfeedermotor(0);
 }
 
-// Returns true when the command should end.
+void eject::End(bool interrupted) {
+  FuelSubsystem Set.IntakeLauncherRoller(0);
+  FuelSubsystem Set.FeederRoller(0);
+}
+
 bool eject::IsFinished() {
   return false;
 }
+

@@ -21,7 +21,7 @@ class FuelSubsystem : public frc2::SubsystemBase {
   void eject();
   void launch();
   void stop();
-  void spinUp();
+  void spinup();
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

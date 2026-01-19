@@ -15,14 +15,14 @@
  * directly; this is crucially important, or else the decorator functions in
  * Command will *not* work!
  */
-class eject
-    : public frc2::CommandHelper<frc2::Command, eject> {
+class lauch
+    : public frc2::CommandHelper<frc2::Command, lauch> {
  public:
   /* You should consider using the more terse Command factories API instead
    * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
    */
-  eject();
-eject(FuelSubsystem *fuelSubsystem);
+  lauch();
+
   void Initialize() override;
 
   void Execute() override;
