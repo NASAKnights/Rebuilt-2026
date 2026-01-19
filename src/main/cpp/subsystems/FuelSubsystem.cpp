@@ -17,18 +17,18 @@ void FuelSubsystem::stop() {
 
 }
 void FuelSubsystem::intake() {
-    intakeMotor.set(-12);
-    feederMotor.set(10);
+    intakeMotor.Set(-12);
+    feederMotor.Set(10);
 }
 void FuelSubsystem::eject() {
-    intakeMotor.set(10);
-    feederMotor.set(-12);
+    intakeMotor.Set(10);
+    feederMotor.Set(-12);
 }
 void FuelSubsystem::launch() {
-    feederMotor.set(9);
-    intakeMotor.set(10.6);
+    feederMotor.Set(9);
+    intakeMotor.Set(10.6);
 }
 void FuelSubsystem::spinup() {
-    feederMotor.setVoltage(-6);
-    intakeMotor.set(10.6);
+    feederMotor.Set(6);
+    intakeMotor.Set(10.6);
 }

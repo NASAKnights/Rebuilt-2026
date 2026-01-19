@@ -16,14 +16,14 @@ lauch::lauch() {
 }
 
 // Called when the command is initially scheduled.
-void lauch::Initialize() {FuelSubsystem Set.IntakeLauncherRoller(
-      frc::SmartDashboard::GetNumber(
-          "Launching launcher roller value",
-          LAUNCHING_LAUNCHER_VOLTAGE));
-          FuelSubsystem set.FeederRoller(
-      frc::SmartDashboard::GetNumber(
-          "Launching feeder roller value",
-          LAUNCHING_FEEDER_VOLTAGE));}
+void lauch::Initialize() 
+  {
+ m_fuelSubsystem->IntakeLauncherRoller(
+        frc::SmartDashboard::GetNumber("Intaking intake roller value", 10));
+
+    m_fuelSubsystem->FeederRoller(
+        frc::SmartDashboard::GetNumber("Intaking feeder roller value", -12));
+        }
 
 // Called repeatedly when this Command is scheduled to run
 void lauch::Execute() {}

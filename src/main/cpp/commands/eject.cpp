@@ -12,19 +12,21 @@ eject::eject(FuelSubsystem* fuelSubsystem)
 }
 
 void eject::Initialize() {
-  FuelSubsystem Set.IntakeLauncherRoller(-1 * frc::SmartDashboard::GetNumber("Intaking intake roller value",INTAKING_INTAKE_VOLTAGE))
+   m_fuelSubsystem->IntakeLauncherRoller(
+        -frc::SmartDashboard::GetNumber("Intaking intake roller value", 10));
 
-  FuelSubsystem Set.FeederRoller(-1 * frc::SmartDashboard::GetNumber("Intaking feeder roller value",INTAKING_FEEDER_VOLTAGE));
+    m_fuelSubsystem->FeederRoller(
+        -frc::SmartDashboard::GetNumber("Intaking feeder roller value", -12));
 }
 
 void eject::Execute() {
 
 }
-
 void eject::End(bool interrupted) {
-  FuelSubsystem Set.IntakeLauncherRoller(0);
-  FuelSubsystem Set.FeederRoller(0);
+  m_fuelSubsystem->IntakeLauncherRoller(0);
+  m_fuelSubsystem->FeederRoller(0);
 }
+
 
 bool eject::IsFinished() {
   return false;

@@ -30,4 +30,7 @@ class lauch
   void End(bool interrupted) override;
 
   bool IsFinished() override;
+  private:
+    FuelSubsystem* m_fuelSubsystem;
+
 };

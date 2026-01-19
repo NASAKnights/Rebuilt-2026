@@ -4,24 +4,28 @@
 
 #include "commands/Intake.h"
 #include "Constants.h"
-
+#include <frc/smartdashboard/SmartDashboard.h>
 Intake::Intake() {
   // Use addRequirements() here to declare subsystem dependencies.
 }
 
-// Called when the command is initially scheduled.
-void Intake::Initialize() {FuelSubsystem
-        set.IntakeLauncherRoller(SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
-    FuelSubsystem set.FeederRoller(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));}
+void Intake::Initialize() {
+   m_fuelSubsystem->IntakeLauncherRoller(
+        frc::SmartDashboard::GetNumber("Intaking intake roller value", 10));
 
-// Called repeatedly when this Command is scheduled to run
-void Intake::Execute() {}
+    m_fuelSubsystem->FeederRoller(
+        frc::SmartDashboard::GetNumber("Intaking feeder roller value", -12));
+}
 
-// Called once the command ends or is interrupted.
-void Intake::End(bool interrupted) {FuelSubsystem set.IntakeLauncherRoller(0);
-    FuelSubsystem set.FeederRoller(0);}
+void Intake::Execute() {
 
-// Returns true when the command should end.
+}
+void Intake::End(bool interrupted) {
+  m_fuelSubsystem->IntakeLauncherRoller(0);
+  m_fuelSubsystem->FeederRoller(0);
+}
+
+
 bool Intake::IsFinished() {
   return false;
 }

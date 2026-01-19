@@ -6,9 +6,12 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <rev/SparkMax.h>
+#include <rev/rev/REVLibVersion.h>
 
 
-class FuelSubsystem : public frc2::SubsystemBase {
+
+class FuelSubsystem : 
+public frc2::SubsystemBase {
  public:
   FuelSubsystem();
 
@@ -22,13 +25,14 @@ class FuelSubsystem : public frc2::SubsystemBase {
   void launch();
   void stop();
   void spinup();
+  void IntakeLauncherRoller(double voltage);
+  void FeederRoller(double voltage);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
-  rev::SparkMax intakeMotor{1, rev::Motortype::kBrushed};
-  rev::SparkMax feederMotor{2, rev::Motortype::kBrushed};
-
+  rev::spark::SparkMax intakeMotor{1, rev::spark::SparkMax::MotorType::kBrushed};
+  rev::spark::SparkMax feederMotor{2, rev::spark::SparkMax::MotorType::kBrushed};
 
 };
