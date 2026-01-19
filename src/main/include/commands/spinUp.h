@@ -6,6 +6,7 @@
 
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
+#include <subsystems/FuelSubsystem.h>
 
 /**
  * An example command.
@@ -14,13 +15,13 @@
  * directly; this is crucially important, or else the decorator functions in
  * Command will *not* work!
  */
-class Launchseq
-    : public frc2::CommandHelper<frc2::Command, Launchseq> {
+class spinUp
+    : public frc2::CommandHelper<frc2::Command, spinUp> {
  public:
   /* You should consider using the more terse Command factories API instead
    * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
    */
-  Launchseq();
+  spinUp();
 
   void Initialize() override;
 
@@ -29,4 +30,7 @@ class Launchseq
   void End(bool interrupted) override;
 
   bool IsFinished() override;
+ private:
+  FuelSubsystem* m_fuelSubsystem;
+
 };
