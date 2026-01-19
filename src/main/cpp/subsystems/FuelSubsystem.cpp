@@ -19,8 +19,8 @@ void FuelSubsystem::stop() {
 void FuelSubsystem::intake() { intakeMotor.set(-12);
     feederMotor.set(10);}
 void FuelSubsystem::eject() {
-    intakeMotor.set(10);
-    feederMotor.set(-12);
+    intakeMotor.set(-10);
+    feederMotor.set(12);
 }
 void FuelSubsystem::launch() {
     feederMotor.set(9);
