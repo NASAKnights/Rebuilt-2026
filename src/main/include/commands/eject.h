@@ -21,8 +21,8 @@ class eject
   /* You should consider using the more terse Command factories API instead
    * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
    */
-  eject();
-eject(FuelSubsystem *fuelSubsystem);
+  eject(FuelSubsystem* _fuelSubsystem);
+  
   void Initialize() override;
 
   void Execute() override;

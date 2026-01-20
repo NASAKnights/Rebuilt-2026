@@ -11,27 +11,22 @@
 using namespace Constants;
 
 
-lauch::lauch() {
-  // Use addRequirements() here to declare subsystem dependencies.
+launch::launch(FuelSubsystem* _fuelSubsystem):m_fuelSubsystem{_fuelSubsystem} {
+  AddRequirements(m_fuelSubsystem);
 }
 
-// Called when the command is initially scheduled.
-void lauch::Initialize() 
-  {
- m_fuelSubsystem->IntakeLauncherRoller(
-        frc::SmartDashboard::GetNumber("Intaking intake roller value", 10));
+void launch::Initialize() {
+  m_fuelSubsystem->launch();
+}
 
-    m_fuelSubsystem->FeederRoller(
-        frc::SmartDashboard::GetNumber("Intaking feeder roller value", -12));
-        }
+void launch::Execute() {
 
-// Called repeatedly when this Command is scheduled to run
-void lauch::Execute() {}
+}
 
-// Called once the command ends or is interrupted.
-void lauch::End(bool interrupted) {}
+void launch::End(bool interrupted) {
 
-// Returns true when the command should end.
-bool lauch::IsFinished() {
+}
+
+bool launch::IsFinished() {
   return false;
 }

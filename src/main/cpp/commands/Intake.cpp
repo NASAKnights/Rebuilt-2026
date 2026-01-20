@@ -4,27 +4,23 @@
 
 #include "commands/Intake.h"
 #include "Constants.h"
-#include <frc/smartdashboard/SmartDashboard.h>
-Intake::Intake() {
-  // Use addRequirements() here to declare subsystem dependencies.
+
+Intake::Intake(FuelSubsystem* _fuelSubsystem):m_fuelSubsystem{_fuelSubsystem} {
+  AddRequirements(m_fuelSubsystem);
 }
 
 void Intake::Initialize() {
-   m_fuelSubsystem->IntakeLauncherRoller(
-        frc::SmartDashboard::GetNumber("Intaking intake roller value", 10));
-
-    m_fuelSubsystem->FeederRoller(
-        frc::SmartDashboard::GetNumber("Intaking feeder roller value", -12));
+   m_fuelSubsystem->intake();
 }
 
 void Intake::Execute() {
 
 }
+
 void Intake::End(bool interrupted) {
   m_fuelSubsystem->IntakeLauncherRoller(0);
   m_fuelSubsystem->FeederRoller(0);
 }
-
 
 bool Intake::IsFinished() {
   return false;

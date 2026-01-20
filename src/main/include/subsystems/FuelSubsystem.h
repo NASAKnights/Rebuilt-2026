@@ -8,8 +8,6 @@
 #include <rev/SparkMax.h>
 #include <rev/rev/REVLibVersion.h>
 
-
-
 class FuelSubsystem : 
 public frc2::SubsystemBase {
  public:

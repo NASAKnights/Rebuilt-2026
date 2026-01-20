@@ -21,7 +21,7 @@ class Intake
   /* You should consider using the more terse Command factories API instead
    * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
    */
-  Intake();
+  Intake(FuelSubsystem* _fuelSubsystem);
 
   void Initialize() override;
 

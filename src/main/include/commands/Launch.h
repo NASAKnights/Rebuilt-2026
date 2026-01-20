@@ -15,13 +15,13 @@
  * directly; this is crucially important, or else the decorator functions in
  * Command will *not* work!
  */
-class lauch
-    : public frc2::CommandHelper<frc2::Command, lauch> {
+class launch
+    : public frc2::CommandHelper<frc2::Command, launch> {
  public:
   /* You should consider using the more terse Command factories API instead
    * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
    */
-  lauch();
+  launch(FuelSubsystem* _fuelSubsystem);
 
   void Initialize() override;
 

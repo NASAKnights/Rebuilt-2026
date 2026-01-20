@@ -1,32 +1,28 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "commands/eject.h"
-
-#include <frc/smartdashboard/SmartDashboard.h>
-
 #include "Constants.h"
 
 using namespace Constants;
 
-eject::eject(FuelSubsystem* fuelSubsystem)
-  {
-  AddRequirements({fuelSubsystem});
+eject::eject(FuelSubsystem* _fuelSubsystem):m_fuelSubsystem{_fuelSubsystem} {
+  AddRequirements(m_fuelSubsystem);
 }
 
 void eject::Initialize() {
-   m_fuelSubsystem->IntakeLauncherRoller(
-        -frc::SmartDashboard::GetNumber("Intaking intake roller value", 10));
-
-    m_fuelSubsystem->FeederRoller(
-        -frc::SmartDashboard::GetNumber("Intaking feeder roller value", -12));
+   m_fuelSubsystem->eject();
 }
 
 void eject::Execute() {
 
 }
+
 void eject::End(bool interrupted) {
   m_fuelSubsystem->IntakeLauncherRoller(0);
   m_fuelSubsystem->FeederRoller(0);
 }
-
 
 bool eject::IsFinished() {
   return false;

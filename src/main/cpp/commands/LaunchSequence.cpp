@@ -1,12 +1,14 @@
 #include "commands/LaunchSequence.h"
-
-#include "commands/SpinUp.h"
+#include "commands/spinUp.h"
 #include "commands/Launch.h"
 #include "Constants.h"
+#include <units/time.h>
+#include <frc2/command/SequentialCommandGroup.h>
 
-LaunchSequence::LaunchSequence(CANFuelSubsystem* fuelSubsystem) {
+LaunchSequence::LaunchSequence(FuelSubsystem* fuelSubsystem) {
+  // Add commands to this SequentialCommandGroup instance
   AddCommands(
-      SpinUp(fuelSubsystem).WithTimeout(FuelConstants::SPIN_UP_SECONDS),
-      Launch(fuelSubsystem)
+    spinUp(fuelSubsystem),
+    launch(fuelSubsystem)
   );
 }

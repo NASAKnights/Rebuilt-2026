@@ -14,7 +14,6 @@ void FuelSubsystem::Periodic() {}
 void FuelSubsystem::stop() {
     intakeMotor.Set(0);
     feederMotor.Set(0);
-
 }
 void FuelSubsystem::intake() {
     intakeMotor.Set(-12);
@@ -31,4 +30,10 @@ void FuelSubsystem::launch() {
 void FuelSubsystem::spinup() {
     feederMotor.Set(6);
     intakeMotor.Set(10.6);
+}
+void FuelSubsystem::IntakeLauncherRoller(double voltage) {
+    intakeMotor.Set(voltage);
+}
+void FuelSubsystem::FeederRoller(double voltage) {
+    feederMotor.Set(voltage);
 }

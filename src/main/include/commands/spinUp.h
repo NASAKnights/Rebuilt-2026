@@ -7,6 +7,7 @@
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 #include <subsystems/FuelSubsystem.h>
+#include <frc/Timer.h>
 
 /**
  * An example command.
@@ -21,7 +22,7 @@ class spinUp
   /* You should consider using the more terse Command factories API instead
    * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
    */
-  spinUp();
+  spinUp(FuelSubsystem* _fuelSubsystem);
 
   void Initialize() override;
 
@@ -32,5 +33,6 @@ class spinUp
   bool IsFinished() override;
  private:
   FuelSubsystem* m_fuelSubsystem;
+  frc::Timer time;
 
 };

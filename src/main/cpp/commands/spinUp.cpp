@@ -1,32 +1,26 @@
 #include "commands/spinUp.h"
-
-#include <frc/smartdashboard/SmartDashboard.h>
-
 #include "Constants.h"
 
-spinUp::spinUp() {
-
-void spinUp::Initialize() {
-  m_fuelSubsystem->SetIntakeLauncherRoller(
-      frc::SmartDashboard::GetNumber(
-          "Launching launcher roller value",
-          FuelConstants::LAUNCHING_LAUNCHER_VOLTAGE));
-
-  m_fuelSubsystem->SetFeederRoller(
-      frc::SmartDashboard::GetNumber(
-          "Launching spin-up feeder value",
-          FuelConstants::SPIN_UP_FEEDER_VOLTAGE));
+spinUp::spinUp(FuelSubsystem* _fuelSubsystem):m_fuelSubsystem{_fuelSubsystem} {
+  AddRequirements(m_fuelSubsystem);
 }
 
+void spinUp::Initialize() {
+  m_fuelSubsystem->spinup();
+  time.Reset();
+  time.Start();
+}
 
 void spinUp::Execute() {
-  // No periodic updates required
 }
 
 void spinUp::End(bool interrupted) {
-  // No shutdown behavior (matches Java)
 }
 
 bool spinUp::IsFinished() {
-  return false;
+  if(time.HasElapsed(units::second_t{Constants::FuelConstants::SPIN_UP_SECONDS})) {
+    return true;
+  } else {
+    return false;
+  }
 }
