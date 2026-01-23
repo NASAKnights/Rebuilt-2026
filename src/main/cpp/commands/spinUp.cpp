@@ -1,5 +1,5 @@
 #include "commands/spinUp.h"
-#include "Constants.h"
+#include "Constants.hpp"
 
 spinUp::spinUp(FuelSubsystem* _fuelSubsystem):m_fuelSubsystem{_fuelSubsystem} {
   AddRequirements(m_fuelSubsystem);
@@ -18,7 +18,7 @@ void spinUp::End(bool interrupted) {
 }
 
 bool spinUp::IsFinished() {
-  if(time.HasElapsed(units::second_t{Constants::FuelConstants::SPIN_UP_SECONDS})) {
+  if(time.HasElapsed(units::second_t{FuelConstants::SPIN_UP_SECONDS})) {
     return true;
   } else {
     return false;

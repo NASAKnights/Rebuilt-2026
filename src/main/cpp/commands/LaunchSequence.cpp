@@ -1,7 +1,7 @@
 #include "commands/LaunchSequence.h"
 #include "commands/spinUp.h"
 #include "commands/Launch.h"
-#include "Constants.h"
+#include "Constants.hpp"
 #include <units/time.h>
 #include <frc2/command/SequentialCommandGroup.h>
 

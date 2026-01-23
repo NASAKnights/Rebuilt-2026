@@ -242,16 +242,39 @@ void Robot::BindCommands()
 {
 
     // --------------DRIVER BUTTONS----------------------------------
-    frc2::JoystickButton(&m_driverController, 1)
+    frc2::JoystickButton(&m_driverController, 3)
         .OnTrue(frc2::CommandPtr(
             frc2::InstantCommand([this]
                                  { return m_swerveDrive.ResetHeading(); })));
 
-    frc2::JoystickButton(&m_driverController, 3)
-        .OnTrue(scoreClosest.get())
-        .OnFalse(frc2::CommandPtr(
-            frc2::InstantCommand([this]
-                                 { return m_pathfind.Cancel(); })));
+    // frc2::JoystickButton(&m_driverController, 3)
+    //     .OnTrue(scoreClosest.get())
+    //     .OnFalse(frc2::CommandPtr(
+    //         frc2::InstantCommand([this]
+    //                              { return m_pathfind.Cancel(); })));
+
+    frc2::JoystickButton(&m_driverController, 1)
+                .OnTrue(new LaunchSequence(m_fuelSubsystem))
+                .OnFalse(frc2::CommandPtr(
+                    frc2::InstantCommand([this]
+                    { return m_fuelSubsystem->stop(); })));
+
+    frc2::JoystickButton(&m_driverController, 5)
+                .OnTrue(frc2::CommandPtr(
+                    frc2::InstantCommand([this]
+                                { return m_fuelSubsystem->intake(); })))
+                .OnFalse(frc2::CommandPtr(
+                    frc2::InstantCommand([this]
+                    { return m_fuelSubsystem->stop(); })));
+
+    frc2::JoystickButton(&m_driverController, 6)
+                .OnTrue(frc2::CommandPtr(
+                    frc2::InstantCommand([this]
+                                { return m_fuelSubsystem->eject(); })))
+                .OnFalse(frc2::CommandPtr(
+                    frc2::InstantCommand([this]
+                    { return m_fuelSubsystem->stop(); })));
+
 
     // --------------OPERATOR BUTTONS--------------------------------
 
@@ -261,7 +284,32 @@ void Robot::BindCommands()
     //         {
     //             m_elevator.Zero();
     //             return;
-    //         })));
+    //         })));frc2::JoystickButton(&m_driverController, 1)
+
+
+//             frc2::JoystickButton(&m_operatorController, 1)
+//                 .OnTrue(frc2::CommandPtr(
+//                     frc2::InstantCommand([this]
+//                                 { return m_fuelSubsystem->launch(); })))
+//                 .OnFalse(frc2::CommandPtr(
+//                     frc2::InstantCommand([this]
+//                     { return m_fuelSubsystem->stop(); })));
+
+//       frc2::JoystickButton(&m_operatorController, 5)
+//                 .OnTrue(frc2::CommandPtr(
+//                     frc2::InstantCommand([this]
+//                                 { return m_fuelSubsystem->intake(); })))
+//                 .OnFalse(frc2::CommandPtr(
+//                     frc2::InstantCommand([this]
+//                     { return m_fuelSubsystem->stop(); })));
+
+//  frc2::JoystickButton(&m_operatorController, 6)
+//                 .OnTrue(frc2::CommandPtr(
+//                     frc2::InstantCommand([this]
+//                                 { return m_fuelSubsystem->eject(); })))
+//                 .OnFalse(frc2::CommandPtr(
+//                     frc2::InstantCommand([this]
+//                     { return m_fuelSubsystem->stop(); })));
 }
 
 void Robot::DisabledPeriodic()

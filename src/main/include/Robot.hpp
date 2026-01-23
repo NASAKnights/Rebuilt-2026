@@ -42,7 +42,12 @@
 #include "subsystems/Climber.h"
 
 #include "commands/AutoWheelOffsets.h"
-
+#include "commands/eject.h"
+#include "commands/Intake.h"
+#include "commands/Launch.h"
+#include "commands/LaunchSequence.h"
+#include "commands/spinUp.h"
+#include "subsystems/FuelSubsystem.h"
 #include <cmath>
 
 class Robot : public frc::TimedRobot
@@ -119,6 +124,8 @@ private:
     POIGenerator m_poiGenerator;
     frc2::CommandPtr m_pathfind = frc2::InstantCommand().ToPtr();
     frc2::CommandPtr scoreClosest = frc2::InstantCommand().ToPtr();
+
+    FuelSubsystem* m_fuelSubsystem;
 
     frc2::CommandPtr addPOICommand = frc2::CommandPtr(frc2::InstantCommand([this]
                                                                            { return m_poiGenerator.MakePOI(); }))

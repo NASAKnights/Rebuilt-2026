@@ -6,9 +6,7 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include "Constants.h"
-
-using namespace Constants;
+#include "Constants.hpp"
 
 
 launch::launch(FuelSubsystem* _fuelSubsystem):m_fuelSubsystem{_fuelSubsystem} {
@@ -24,7 +22,7 @@ void launch::Execute() {
 }
 
 void launch::End(bool interrupted) {
-
+  m_fuelSubsystem->stop();
 }
 
 bool launch::IsFinished() {

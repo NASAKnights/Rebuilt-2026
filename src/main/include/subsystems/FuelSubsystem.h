@@ -6,7 +6,9 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <rev/SparkMax.h>
-#include <rev/rev/REVLibVersion.h>
+#include <ctre/phoenix/motorcontrol/can/VictorSPX.h>
+
+#include "Constants.hpp"
 
 class FuelSubsystem : 
 public frc2::SubsystemBase {
@@ -23,14 +25,17 @@ public frc2::SubsystemBase {
   void launch();
   void stop();
   void spinup();
-  void IntakeLauncherRoller(double voltage);
-  void FeederRoller(double voltage);
+  // void IntakeLauncherRoller(double voltage);
+  // void FeederRoller(double voltage);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
-  rev::spark::SparkMax intakeMotor{1, rev::spark::SparkMax::MotorType::kBrushed};
-  rev::spark::SparkMax feederMotor{2, rev::spark::SparkMax::MotorType::kBrushed};
+  // rev::spark::SparkMax intakeMotor{1, rev::spark::SparkMax::MotorType::kBrushed};
+  // rev::spark::SparkMax feederMotor{2, rev::spark::SparkMax::MotorType::kBrushed};
+
+  ctre::phoenix::motorcontrol::can::VictorSPX intakeMotor{FuelConstants::INTAKE_LAUNCHER_MOTOR_ID};
+  ctre::phoenix::motorcontrol::can::VictorSPX feederMotor{FuelConstants::FEEDER_MOTOR_ID};
 
 };
