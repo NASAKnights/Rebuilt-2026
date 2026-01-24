@@ -37,6 +37,7 @@
 
 #include "subsystems/Elevator.h"
 #include "subsystems/Wrist.h"
+#include "subsystems/Turret_Shooter.h"
 
 #include "subsystems/LEDController.h"
 #include "subsystems/Climber.h"
@@ -87,6 +88,7 @@ private:
     // Wrist m_wrist;
     // Elevator m_elevator;
     // Climber m_climber;
+    Turret_Shooter m_turret_shooter;
 
     std::string_view baseLink = "base_link";
     nt::StructPublisher<frc::Pose3d> stageOne3dPOS;
