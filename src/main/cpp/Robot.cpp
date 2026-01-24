@@ -42,7 +42,7 @@ void Robot::RobotPeriodic()
     m_PowerLog.Append(m_pdh.GetTotalPower());
     m_EnergyLog.Append(m_pdh.GetTotalEnergy());
     m_TemperatureLog.Append(m_pdh.GetTemperature());
-    m_BatteryLog.Append(batteryShunt.GetVoltage());
+    // m_BatteryLog.Append(batteryShunt.GetVoltage());
 
     frc::Pose2d pose = frc::Pose2d(units::length::meter_t{0.0}, units::length::meter_t{0.0}, frc::Rotation2d{});
 
@@ -201,7 +201,7 @@ void Robot::CreateRobot()
                                                        DriveConstants::kDefaultAxisDeadband);
             auto leftYAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(0),
                                                        DriveConstants::kDefaultAxisDeadband);
-            auto rightXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(2),
+            auto rightXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(4),
                                                         DriveConstants::kDefaultAxisDeadband);
 
             // m_swerveDrive.WeightedDriving(approach, leftXAxis, leftYAxis, rightXAxis, targetKey);
@@ -254,26 +254,26 @@ void Robot::BindCommands()
     //                              { return m_pathfind.Cancel(); })));
 
     frc2::JoystickButton(&m_driverController, 1)
-                .OnTrue(new LaunchSequence(m_fuelSubsystem))
+                .OnTrue(LaunchSequence(&m_fuelSubsystem).ToPtr())
                 .OnFalse(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                    { return m_fuelSubsystem->stop(); })));
+                    { return m_fuelSubsystem.stop(); })));
 
     frc2::JoystickButton(&m_driverController, 5)
                 .OnTrue(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                                { return m_fuelSubsystem->intake(); })))
+                                { return m_fuelSubsystem.intake(); })))
                 .OnFalse(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                    { return m_fuelSubsystem->stop(); })));
+                    { return m_fuelSubsystem.stop(); })));
 
     frc2::JoystickButton(&m_driverController, 6)
                 .OnTrue(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                                { return m_fuelSubsystem->eject(); })))
+                                { return m_fuelSubsystem.eject(); })))
                 .OnFalse(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                    { return m_fuelSubsystem->stop(); })));
+                    { return m_fuelSubsystem.stop(); })));
 
 
     // --------------OPERATOR BUTTONS--------------------------------
@@ -320,7 +320,7 @@ void Robot::DisabledPeriodic()
 
 void Robot::UpdateDashboard()
 {
-    frc::SmartDashboard::PutNumber("Robot/Battery Amps", batteryShunt.GetVoltage());
+    // frc::SmartDashboard::PutNumber("Robot/Battery Amps", batteryShunt.GetVoltage());
     frc::SmartDashboard::PutNumber("Robot/PDH Total Current", m_pdh.GetTotalCurrent());
 }
 

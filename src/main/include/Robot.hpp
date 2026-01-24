@@ -84,10 +84,10 @@ private:
     // Subsystems
 
     frc::SendableChooser<std::string> m_chooser;
-    frc::AnalogInput batteryShunt{0};
+    // frc::AnalogInput batteryShunt{0};
 
     ctre::phoenix6::CANBus NKCANBus{"NKCANivore"};
-    ctre::phoenix6::CANBus RioCANBus{"rio"};
+    // ctre::phoenix6::CANBus RioCANBus{"rio"};
     SwerveDrive m_swerveDrive{NKCANBus};
     // Wrist m_wrist;
     // Elevator m_elevator;
@@ -125,7 +125,7 @@ private:
     frc2::CommandPtr m_pathfind = frc2::InstantCommand().ToPtr();
     frc2::CommandPtr scoreClosest = frc2::InstantCommand().ToPtr();
 
-    FuelSubsystem* m_fuelSubsystem;
+    FuelSubsystem m_fuelSubsystem;
 
     frc2::CommandPtr addPOICommand = frc2::CommandPtr(frc2::InstantCommand([this]
                                                                            { return m_poiGenerator.MakePOI(); }))
