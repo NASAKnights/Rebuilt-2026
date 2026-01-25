@@ -52,8 +52,8 @@ private:
   double kA = 0.0;
   double kV = 0.0;
 
-  const int kMotorIdLeft = 5;
-  const int kMotorIdRight = 6;
+  const int kMotorIdLeft = 1;
+  const int kMotorIdRight = 3;
 
   bool kEnableCurrentLimit = true;
   units::ampere_t kPeakCurrentLimit = units::ampere_t{53};
