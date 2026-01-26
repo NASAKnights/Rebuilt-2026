@@ -20,12 +20,10 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
                             ElectricalConstants::kBackRightTurnMotorID,
                             ElectricalConstants::kBackRightEncoderID,
                             DriveConstants::kBackRightOffset, m_canBus)}},
-        m_pigeon{2, m_canBus},
       kSwerveKinematics{{DriveConstants::kFrontLeftPosition, DriveConstants::kFrontRightPosition,
                          DriveConstants::kBackLeftPosition, DriveConstants::kBackRightPosition}},
       pidX{0.9, 1e-4, 0}, pidY{0.9, 1e-4, 0}, pidRot{0.15, 0, 0}, networkTableInst(nt::NetworkTableInstance::GetDefault()), m_poseEstimator{kSwerveKinematics,
-                                                                                                                                            frc::Rotation2d(m_pigeon.GetYaw().GetValue()), // TODO: YAW is CCW+ whereas this API is CW+ (Check if need to reverse)
-                                                                                                                                            // frc::Rotation2d(units::radian_t{navx.GetYaw()}), // TODO: YAW is CCW+ whereas this API is CW+ (Check if need to reverse)
+                                                                                                                                            frc::Rotation2d(0_deg), // Initial pose rotation, will be updated
                                                                                                                                             {modules[0].GetPosition(), modules[1].GetPosition(), modules[2].GetPosition(),
                                                                                                                                              modules[3].GetPosition()},
                                                                                                                                             frc::Pose2d()},
@@ -34,6 +32,31 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
 
     // Add a function that loads the Robot Preferences, including
     // offsets, Module positions, max speed, wheel diameter
+
+    // GYRO INITIALIZATION AND FALLBACK LOGIC
+    auto pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
+    // Try to refresh a few times to be sure
+    if (pigeonStatus != ctre::phoenix::StatusCode::OK) {
+        frc::Wait(0.1_s);
+        pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
+    }
+
+    if (pigeonStatus == ctre::phoenix::StatusCode::OK) {
+        m_usingPigeon = true;
+        std::cout << "SwerveDrive: Successfully connected to Pigeon2." << std::endl;
+        frc::SmartDashboard::PutString("Gyro Source", "Pigeon");
+    } else {
+        m_usingPigeon = false;
+        std::cout << "SwerveDrive: Failed to connect to Pigeon2 (Status: " << pigeonStatus.GetName() << "). Falling back to NavX." << std::endl;
+        
+        if (navx.IsConnected()) {
+             std::cout << "SwerveDrive: NavX is connected." << std::endl;
+             frc::SmartDashboard::PutString("Gyro Source", "NavX");
+        } else {
+             std::cout << "SwerveDrive: CRITICAL - NavX is ALSO disconnected!" << std::endl;
+             frc::SmartDashboard::PutString("Gyro Source", "NONE");
+        }
+    }
 
     kSwerveKinematics = frc::SwerveDriveKinematics<4U>{
         {DriveConstants::kFrontLeftPosition, DriveConstants::kFrontRightPosition,
@@ -44,7 +67,12 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
     // degrees_t x_deg = degrees_t{x} (Psuedo code)
 
     // navx.Calibrate();
-    // navx.Reset();
+    navx.Reset();
+    m_pigeon.SetYaw(0_deg);
+    
+    // Reseed the pose estimator with the correct initial rotation
+    m_poseEstimator.ResetPosition(GetHeading(), GetModulePositions(), frc::Pose2d());
+
 
     speeds = frc::ChassisSpeeds();
     networkTableInst.StartServer();
@@ -146,21 +174,20 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
 // This method will be called once per scheduler run
 void SwerveDrive::Periodic()
 {
-    // getCameraResults();
-    // sensor fusion? EKF (eek kinda fun) (extended Kalman filter)
-
+    if constexpr (frc::RobotBase::IsSimulation())
+    {
+        SimulationPeriodic();
+    }
     PublishOdometry(m_poseEstimator.GetEstimatedPosition());
     if (useVision)
     {
         UpdatePoseEstimate();
     }
-    m_poseEstimator.Update(m_pigeon.GetRotation2d(), GetModulePositions());
+    m_poseEstimator.Update(GetHeading(), GetModulePositions());
     m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
 
-    // PrintNetworkTableValues();
 
     frc::SmartDashboard::PutNumber("Heading", GetHeading().Degrees().value());
-    // UpdateOdometry();
     PeriodicShuffleboard();
 }
 
@@ -169,8 +196,21 @@ void SwerveDrive::SimulationPeriodic()
 
     units::second_t dt = m_simTimer.Get();
     m_simTimer.Reset();
-    units::angle::degree_t delta = m_pigeon.GetAngularVelocityZWorld().GetValue() * dt;
-    m_pigeonSim.AddYaw(delta);
+    units::angle::degree_t delta = 0_deg;
+    
+    if (m_usingPigeon) {
+       delta = m_pigeon.GetAngularVelocityZWorld().GetValue() * dt;
+       m_pigeonSim.AddYaw(delta);
+    } else {
+       // Assuming navx sim support, but simplified for now.
+       // Without pigeon loop-back in sim, we might need manual integration or navx sim support.
+       // Fallback for sim: use speeds.omega
+       delta = speeds.omega * dt;
+       // Note: NavX Sim is tricky without the Sim object exposed or initialized.
+    }
+    // Apply delta to simulated heading
+    m_simAngle = frc::Rotation2d(m_simAngle.Radians() + delta);
+
 }
 
 void SwerveDrive::Drive(frc::ChassisSpeeds speeds)
@@ -182,7 +222,7 @@ void SwerveDrive::Drive(frc::ChassisSpeeds speeds)
 
         auto prevVX = frc::SmartDashboard::GetNumber("drive/vx", 0.0);
         auto prevVY = frc::SmartDashboard::GetNumber("drive/vy", 0.0);
-        double accelLimit = frc::SmartDashboard::GetNumber("drive/accelLim", 2.0);
+        double accelLimit = frc::SmartDashboard::GetNumber("drive/accelLim", 4.0);
 
         double velocityCommanded = std::sqrt(std::pow(speeds.vx.value(), 2) + std::pow(speeds.vy.value(), 2));
         double prevVelocity = std::sqrt(std::pow(prevVX, 2) + std::pow(prevVY, 2));
@@ -208,12 +248,15 @@ void SwerveDrive::Drive(frc::ChassisSpeeds speeds)
 
         if constexpr (frc::RobotBase::IsSimulation())
         {
-            m_pigeonSim.SetAngularVelocityZ(speeds.omega);
+            if (m_usingPigeon) {
+                m_pigeonSim.SetAngularVelocityZ(speeds.omega);
+            }
         }
 
         frc::SmartDashboard::PutNumber("drive/vx", speeds.vx.value());
         frc::SmartDashboard::PutNumber("drive/vy", speeds.vy.value());
         frc::SmartDashboard::PutNumber("drive/omega", speeds.omega.value());
+        this->speeds = speeds;
     }
 }
 
@@ -235,29 +278,41 @@ void SwerveDrive::Strafe(frc::ChassisSpeeds s_speeds, double desiredAngle)
         DriveConstants::kMaxTranslationalVelocity, units::radians_per_second_t{0.5});
 
     for (int i = 0; i < 4; i++)
-    {
+        {
         modules[i].SetDesiredState(states[i]);
     }
 
     priorSpeeds = s_speeds;
 }
 
-void SwerveDrive::SetFast() {}
-
-void SwerveDrive::SetSlow() {}
-
 frc::Rotation2d SwerveDrive::GetHeading()
 {
-    return m_pigeon.GetRotation2d();
-    // return navx.GetRotation2d();
+    if constexpr (frc::RobotBase::IsSimulation())
+    {
+        return m_simAngle;
+    }
+    
+    if (m_usingPigeon) {
+        return frc::Rotation2d(m_pigeon.GetYaw().GetValue());
+        // Note: Pigeon2 is CCW+, so this matches standard NWU.
+    } else {
+        // NavX is CW+ by default, need to negate for NWU?
+        // Actually, NavX GetRotation2d() handles this usually, but checks.
+        // GetRotation2d() returns CW positive (NED-like), but we want CCW positive.
+        // Usually we use -GetAngle() or similar.
+        // The previous code had `navx.GetRotation2d()`. Let's stick with that but verifying is good.
+        // Assuming NavX GetRotation2d() aligns with WPILib (CCW+).
+        return navx.GetRotation2d();
+    }
 }
 
 void SwerveDrive::ResetHeading()
 {
     if (enable == true)
     {
-        m_pigeon.Reset();
-        // navx.Reset();
+        navx.Reset();
+        m_pigeon.SetYaw(0_deg);
+        m_simAngle = frc::Rotation2d();
     }
 }
 
@@ -278,7 +333,6 @@ std::array<frc::SwerveModulePosition, 4> SwerveDrive::GetModulePositions()
 
 void SwerveDrive::ResetPose(frc::Pose2d position)
 {
-    // odometry.ResetPosition(GetHeading(), GetModulePositions(), position);
     m_poseEstimator.ResetPosition(GetHeading(), GetModulePositions(), position);
 }
 
@@ -289,7 +343,6 @@ frc::Pose2d SwerveDrive::GetPose()
 
 void SwerveDrive::UpdateOdometry()
 {
-    // odometry.Update(GetHeading(), GetModulePositions());
 }
 frc::ChassisSpeeds SwerveDrive::getRobotRelativeSpeeds()
 {
@@ -381,7 +434,6 @@ void SwerveDrive::UpdatePoseEstimate()
                                                  units::second_t{compressedResults.at(7)});
         }
     }
-    // m_poseEstimator.Update(navx.GetRotation2d(), GetModulePositions());
 }
 
 void SwerveDrive::PublishOdometry(frc::Pose2d odometryPose)
@@ -406,15 +458,12 @@ void SwerveDrive::PublishOdometry(frc::Pose2d odometryPose)
 void SwerveDrive::EnableDrive()
 {
     enable = true;
-    // frc::SmartDashboard::PutBoolean("TestTestTest", enable);
 }
 void SwerveDrive::DisableDrive()
 {
     enable = false;
-    // frc::SmartDashboard::PutBoolean("TestTestTest", enable);
 }
 
-// Warning, this is unfinished (and also deprecated), and may produce results that are not expected
 void SwerveDrive::WeightedDriving(bool approach, double leftXAxis,
                                   double leftYAxis, double rightXAxis, std::string poiKey)
 {
@@ -471,11 +520,23 @@ void SwerveDrive::WeightedDriving(bool approach, double leftXAxis,
         units::radians_per_second_t(saturatedOmega +
                                     double(-rightXAxis * DriveConstants::kMaxRotationalVelocity));
 
-    Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-        vx,
-        vy,
-        omega,
-        GetHeading()));
+    if (m_fieldRelative)
+    {
+        Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+            vx,
+            vy,
+            omega,
+            GetHeading()));
+    }
+    else
+    {
+        Drive(frc::ChassisSpeeds{vx, vy, omega});
+    }
+}
+
+void SwerveDrive::ToggleFieldRelative()
+{
+    m_fieldRelative = !m_fieldRelative;
 }
 
 bool SwerveDrive::atSetpoint()

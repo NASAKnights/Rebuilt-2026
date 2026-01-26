@@ -40,6 +40,7 @@
 
 #include "subsystems/LEDController.h"
 #include "subsystems/Climber.h"
+#include "subsystems/Turret.h"
 
 #include "commands/AutoWheelOffsets.h"
 
@@ -87,6 +88,7 @@ private:
     // Wrist m_wrist;
     // Elevator m_elevator;
     // Climber m_climber;
+    Turret m_turret;
 
     std::string_view baseLink = "base_link";
     nt::StructPublisher<frc::Pose3d> stageOne3dPOS;

@@ -4,6 +4,7 @@
 #include "wpi/DataLog.h"
 #include <ctre/phoenix6/Pigeon2.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
+#include <ctre/phoenix6/controls/PositionVoltage.hpp>
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc/DutyCycleEncoder.h>
 #include <frc/Encoder.h>
@@ -15,9 +16,11 @@
 #include <frc/geometry/Translation2d.h>
 #include <frc/geometry/Transform3d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc2/command/ProfiledPIDSubsystem.h>
+#include <frc/controller/PIDController.h>
+#include <frc2/command/SubsystemBase.h>
 #include <rev/SparkMax.h>
 #include <units/acceleration.h>
+#include <units/angular_velocity.h>
 #include <units/angle.h>
 #include <units/length.h>
 #include <units/time.h>
@@ -52,8 +55,8 @@ namespace TurretConstants
   const double kAngleI = 0.01;
   const double kAngleD = 0.0; // 0.0001
   const double kIZone = 1.0;
-  const auto kTurretVelLimit = units::degrees_per_second_t(200.0);
-  const auto kTurretAccelLimit = units::angular_acceleration::degrees_per_second_squared_t(200); // Mech limit 27 rad/s^2(1500 degree_second_squared)
+  const auto kTurretVelLimit = units::degrees_per_second_t(500.0);
+  const auto kTurretAccelLimit = units::angular_acceleration::degrees_per_second_squared_t(800); // Mech limit 27 rad/s^2(1500 degree_second_squared)
   const units::degree_t kTolerancePos = 1_deg;
   const units::degrees_per_second_t kToleranceVel = 0.5_deg_per_s;
   const int kAngleMotorId = 50;
@@ -91,7 +94,6 @@ namespace TurretConstants
  */
 class Turret : public frc2::SubsystemBase
 {
-  using State = frc::TrapezoidProfile<units::degrees>::State;
 
 public:
   Turret();
@@ -102,12 +104,12 @@ public:
   void SimulationPeriodic();
   void Enable();
   void Disable();
-  void SetAngle(units::degree_t angle);
+  void SetAngle(units::degree_t angle, units::degrees_per_second_t velocity = 0_deg_per_s);
   void Zero();
   void HoldPosition();
   void Reset()
   {
-    m_controller.Reset(GetMeasurement(), GetVelocity());
+    m_controller.Reset();
   }
   // void get_pigeon();
   units::degree_t GetMeasurement();
@@ -119,6 +121,8 @@ public:
 
 private:
   frc::Transform3d goal = frc::Transform3d(2_m, 2_m, 0_m, frc::Rotation3d());
+  nt::DoubleArrayPublisher goalPublisher;
+  nt::DoubleArraySubscriber goalSubscriber;
   static std::optional<frc::Pose2d> DoubleArrayToPose2d(const std::vector<double> &arr)
   {
     if (arr.size() < 7)
@@ -153,19 +157,19 @@ private:
   wpi::log::DoubleLogEntry m_MotorVoltageLog;
   frc::Timer *m_timer;
   float Turret_Angle;
-  units::degree_t findTrackingAngle();
+  std::pair<units::degree_t, units::degrees_per_second_t> findTrackingAngle();
 
   units::degree_t m_goal;
   frc::Timer m_simTimer;
 
   frc::sim::SingleJointedArmSim m_TurretSim;
 
-  frc::ProfiledPIDController<units::degrees> m_controller;
+  frc::PIDController m_controller;
+  units::degrees_per_second_t m_velocityGoal{0.0};
 
   hal::SimDouble m_TurretSimVelocity;
   hal::SimDouble m_TurretSimposition;
   nt::DoubleArraySubscriber baseLinkSubscriber;
-  nt::DoubleArraySubscriber goalSubscriber;
   std::string_view robotPoseLink = "base_link";
   std::string_view goalPoseLink = "goal";
   std::vector<frc::Pose2d> poses{};

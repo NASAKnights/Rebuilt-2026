@@ -45,24 +45,22 @@ void Robot::RobotPeriodic()
     m_BatteryLog.Append(batteryShunt.GetVoltage());
 
     frc::Pose2d pose = frc::Pose2d(units::length::meter_t{0.0}, units::length::meter_t{0.0}, frc::Rotation2d{});
-
-    // frc::Pose3d stageOne3dPOS = frc::Pose3d(pose.X(), pose.Y(), units::length::meter_t(m_elevator.GetHeight()) / 2, frc::Rotation3d(pose.Rotation()));
-    // frc::Pose3d carage3dPOS = frc::Pose3d(pose.X(), pose.Y(), units::length::meter_t(m_elevator.GetHeight()), frc::Rotation3d(pose.Rotation()));
-    // frc::Pose3d wrist3dPOS = frc::Pose3d(0.28_m, 0_m, units::length::meter_t(m_elevator.GetHeight() + 0.595), frc::Rotation3d(units::angle::radian_t{0.0}, units::angle::radian_t{-m_wrist.GetMeasurement()}, units::angle::radian_t{0.0}));
-    // frc::Pose3d climb3dPOS = frc::Pose3d(0_m, 0_m, 0_m, frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad));
-    // std::vector<frc::Pose3d> modelPoses = {
-    //     stageOne3dPOS,
-    //     carage3dPOS,
-    //     wrist3dPOS,
-    //     climb3dPOS,
-    // };
-    // modelPosePublisher.Set(modelPoses, 0);
+    frc::Pose3d TurretPose3D = frc::Pose3d(pose.X(), pose.Y(), 0.0_m, frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad));
+    frc::Pose3d ShooterPose3D = frc::Pose3d(pose.X(), pose.Y(), 0.0_m, frc::Rotation3d(0.0_rad, 0.0_rad, units::radian_t{m_turret.GetMeasurement()}));
+    std::vector<frc::Pose3d> modelPoses = {
+        ShooterPose3D};
+    modelPosePublisher.Set(modelPoses, 0);
 }
 
 // This function is called once each time the robot enters Disabled mode.
 void Robot::DisabledInit()
 {
     // m_LED_Controller.DefaultAnimation();
+    if constexpr (frc::RobotBase::IsSimulation())
+    {
+        m_swerveDrive.ResetPose(frc::Pose2d());
+        m_swerveDrive.ResetDriveEncoders();
+    }
 }
 
 void Robot::SetAutonomousCommand(std::string a)
@@ -98,6 +96,7 @@ void Robot::TeleopInit()
     // this line or comment it out.
     // m_wrist.HoldPosition();
     // m_elevator.HoldPosition();
+    m_turret.Reset();
     /*
     if (m_wrist.GetState() != WristConstants::WristState::ZEROING)
     {
@@ -115,14 +114,7 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic()
 {
-    // if (m_elevator.GetHeight() >= 0.35 && !m_pathfind.IsScheduled())
-    // {
-    //     frc::SmartDashboard::PutNumber("drive/accelLim", 0.5);
-    // }
-    // else
-    // {
-    //     frc::SmartDashboard::PutNumber("drive/accelLim", 4.0);
-    // }
+
 }
 
 void Robot::TeleopExit()
@@ -228,6 +220,9 @@ void Robot::CreateRobot()
     // AddPeriodic([this]
     //             { m_wrist.Periodic(); },
     //             10_ms, 2_ms);
+    AddPeriodic([this]
+                { m_turret.Periodic(); },
+                5_ms, 3_ms);
 
     // Configure the button bindings
     BindCommands();
