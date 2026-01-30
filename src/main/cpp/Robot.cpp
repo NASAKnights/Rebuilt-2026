@@ -254,13 +254,13 @@ void Robot::BindCommands()
     //                              { return m_pathfind.Cancel(); })));
 
     frc2::JoystickButton(&m_driverController, 1)
-                .OnTrue(LaunchSequence(&m_fuelSubsystem).ToPtr())
+                .WhileTrue(LaunchSequence(&m_fuelSubsystem).ToPtr())
                 .OnFalse(frc2::CommandPtr(
                     frc2::InstantCommand([this]
                     { return m_fuelSubsystem.stop(); })));
 
     frc2::JoystickButton(&m_driverController, 5)
-                .OnTrue(frc2::CommandPtr(
+                .WhileTrue(frc2::CommandPtr(
                     frc2::InstantCommand([this]
                                 { return m_fuelSubsystem.intake(); })))
                 .OnFalse(frc2::CommandPtr(
@@ -268,7 +268,7 @@ void Robot::BindCommands()
                     { return m_fuelSubsystem.stop(); })));
 
     frc2::JoystickButton(&m_driverController, 6)
-                .OnTrue(frc2::CommandPtr(
+                .WhileTrue(frc2::CommandPtr(
                     frc2::InstantCommand([this]
                                 { return m_fuelSubsystem.eject(); })))
                 .OnFalse(frc2::CommandPtr(

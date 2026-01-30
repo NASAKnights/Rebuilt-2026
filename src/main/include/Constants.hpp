@@ -29,9 +29,9 @@ namespace FuelConstants {
     static constexpr int FEEDER_MOTOR_CURRENT_LIMIT = 60;
     static constexpr int LAUNCHER_MOTOR_CURRENT_LIMIT = 60;
 
-    static constexpr double INTAKING_FEEDER_VOLTAGE = -12.0;
-    static constexpr double INTAKING_INTAKE_VOLTAGE = 10.0;
-    static constexpr double LAUNCHING_FEEDER_VOLTAGE = 9.0;
+    static constexpr double INTAKING_FEEDER_VOLTAGE = 12.0;
+    static constexpr double INTAKING_INTAKE_VOLTAGE = 8.5;
+    static constexpr double LAUNCHING_FEEDER_VOLTAGE = -11.0;
     static constexpr double LAUNCHING_LAUNCHER_VOLTAGE = 10.6;
     static constexpr double SPIN_UP_FEEDER_VOLTAGE = -6.0;
     static constexpr double SPIN_UP_SECONDS = 1.0;
@@ -105,8 +105,11 @@ namespace DriveConstants
     const SDSModuleType kSDSModule = mk4i_l3;
     // const SDSModuleType kSDSModule = mk4i_l1plus;
 
-    const auto kTrackwidthMeters = 0.4_m; // Add to shuffleboard
-    const auto kWheelbaseMeters = 0.4_m;  // Add to shuffleboard
+    // const auto kTrackwidthMeters = 0.762_m; // Add to shuffleboard
+    // const auto kWheelbaseMeters = 0.4_m;
+
+    const auto kTrackwidthMeters = 0.762_m; // Add to shuffleboard
+    const auto kWheelbaseMeters = 0.635_m;  // Add to shuffleboard
 
     const double kDefaultAxisDeadband = 0.15;
     const units::meters_per_second_t kMaxTranslationalVelocity{4}; // Add to shuffleboard
