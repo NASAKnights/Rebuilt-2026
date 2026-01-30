@@ -86,8 +86,9 @@ namespace TurretConstants
   const double kYOffset = 0.0;
   const double kZOffset = 0.0;
   const units::degree_t kAngleOffset(0.0);
+  const units::volt_t kMaxVoltage = 2.0_V;
 
-} // namespace ArmConstants
+} // namespace TurretConstants
 
 /**
  * A robot m_arm subsystem that moves with a motion profile.
@@ -178,4 +179,9 @@ private:
   frc::FieldObject2d *m_turretObject = nullptr;
   std::optional<frc::Pose2d> m_lastRobotPose;
   std::optional<frc::Pose2d> m_lastTurretPose;
+  
+  // Pose staleness detection
+  int64_t m_lastPoseUpdateTime = 0;
+  std::optional<frc::Pose2d> m_lastValidPose;
+  wpi::log::BooleanLogEntry m_PoseStaleLog;
 };

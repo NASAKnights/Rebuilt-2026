@@ -6,6 +6,8 @@
 #include <frc/geometry/Transform3d.h>
 #include <frc/geometry/Translation2d.h>
 #include <cmath>
+#include <networktables/NetworkTableInstance.h>
+#include <algorithm>
 
 // using State = frc::TrapezoidProfile<units::degrees>::State;
 using degrees_per_second_squared_t =
@@ -37,6 +39,7 @@ Turret::Turret() : m_controller(
     m_StateLog = wpi::log::IntegerLogEntry(log, "/Turret/State");
     m_MotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Turret/MotorCurrent");
     m_MotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Turret/MotorVoltage");
+    m_PoseStaleLog = wpi::log::BooleanLogEntry(log, "/Turret/PoseStale");
 
     networkTableInst = nt::NetworkTableInstance::GetDefault();
     auto poseTable = networkTableInst.GetTable("ROS2Bridge");
@@ -44,7 +47,7 @@ Turret::Turret() : m_controller(
     
     // Initialize goal topic - publish default and subscribe for updates
     auto turretTable = networkTableInst.GetTable("Turret");
-    goalPublisher = turretTable->GetDoubleArrayTopic("goal").Publish();
+    goalPublisher = turretTable->GetDoubleArrayTopic("goal").Publish({.periodic = 0.01, .sendAll = true});
     std::vector<double> defaultGoal = {4.5, 4.0, 0.0};
     goalSubscriber = turretTable->GetDoubleArrayTopic("goal").Subscribe(defaultGoal, {.periodic = 0.02, .sendAll = true});
     // Publish initial default goal
@@ -81,12 +84,70 @@ units::degree_t Turret::GetMeasurement()
 
 std::pair<units::degree_t, units::degrees_per_second_t> Turret::findTrackingAngle()
 {
-    std::vector<double> baseLinkPose = baseLinkSubscriber.Get({});
+    // Use GetAtomic to get both value and timestamp
+    auto poseResult = baseLinkSubscriber.GetAtomic();
+    std::vector<double> baseLinkPose = poseResult.value;
+    int64_t poseTimestamp = poseResult.time;
+    
+    // Check if we have valid pose data
     auto baseLink = DoubleArrayToPose2d(baseLinkPose);
     if (!baseLink.has_value())
     {
+        frc::SmartDashboard::PutString("/Turret/PoseStatus", "No Pose Data");
+        frc::SmartDashboard::PutNumber("/Turret/PoseDataSize", baseLinkPose.size());
+        m_PoseStaleLog.Append(true);
         return {GetMeasurement(), 0_deg_per_s};
     }
+
+    // Check for stale data (timestamp hasn't changed)
+    bool poseIsStale = false;
+    if (m_lastPoseUpdateTime != 0 && poseTimestamp == m_lastPoseUpdateTime)
+    {
+        // Timestamp hasn't changed - pose is stale
+        poseIsStale = true;
+        frc::SmartDashboard::PutString("/Turret/PoseStatus", "STALE - Timestamp Frozen");
+    }
+    else if (m_lastValidPose.has_value())
+    {
+        // Check if pose values are identical (another indicator of staleness)
+        auto lastPose = m_lastValidPose.value();
+        double poseDiff = std::sqrt(
+            std::pow((baseLink->X() - lastPose.X()).value(), 2) +
+            std::pow((baseLink->Y() - lastPose.Y()).value(), 2)
+        );
+        double angleDiff = std::abs((baseLink->Rotation().Radians() - lastPose.Rotation().Radians()).value());
+        
+        // If robot hasn't moved at all in multiple cycles, might be stale
+        // (though it could also just be stationary)
+        if (poseDiff < 0.001 && angleDiff < 0.001)
+        {
+            frc::SmartDashboard::PutString("/Turret/PoseStatus", "WARNING - Pose Unchanged");
+        }
+        else
+        {
+            frc::SmartDashboard::PutString("/Turret/PoseStatus", "OK");
+        }
+    }
+    else
+    {
+        frc::SmartDashboard::PutString("/Turret/PoseStatus", "First Update");
+    }
+
+    // Log staleness state
+    m_PoseStaleLog.Append(poseIsStale);
+    frc::SmartDashboard::PutBoolean("/Turret/PoseStale", poseIsStale);
+    frc::SmartDashboard::PutNumber("/Turret/PoseTimestamp", poseTimestamp / 1e6); // Convert to seconds
+    frc::SmartDashboard::PutNumber("/Turret/PoseAge", (nt::Now() - poseTimestamp) / 1e6); // Age in seconds
+
+    // If pose is stale, hold current position
+    if (poseIsStale)
+    {
+        return {GetMeasurement(), 0_deg_per_s};
+    }
+
+    // Update tracking variables
+    m_lastPoseUpdateTime = poseTimestamp;
+    m_lastValidPose = *baseLink;
 
     frc::Transform3d world2robot = frc::Transform3d(baseLink->X(), baseLink->Y(), 0_m, frc::Rotation3d(0_rad, 0_rad, baseLink->Rotation().Radians()));
 
@@ -137,7 +198,7 @@ std::pair<units::degree_t, units::degrees_per_second_t> Turret::findTrackingAngl
     // If the computed target exceeds the upper limit by >180°, it likely wrapped
     if (newTarget > TurretConstants::kmaxAngle)
     {
-        // If we’re only just beyond by less than 180°, clamp
+        // If we're only just beyond by less than 180°, clamp
         if (newTarget - 360_deg >= TurretConstants::kminAngle)
             newTarget -= 360_deg;
         else
@@ -271,6 +332,7 @@ void Turret::Periodic()
         break;
     }
     }
+    v = std::clamp(v, -TurretConstants::kMaxVoltage, TurretConstants::kMaxVoltage);
     if constexpr (frc::RobotBase::IsSimulation())
     {
         m_TurretSim.SetInputVoltage(v);
