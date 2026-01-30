@@ -21,7 +21,7 @@ Turret_Shooter::Turret_Shooter()
     ctre::phoenix6::configs::CurrentLimitsConfigs currentConfig{};
     currentConfig.SupplyCurrentLimitEnable = kEnableCurrentLimit;
     currentConfig.SupplyCurrentLimit = kPeakCurrentLimit;
-    currentConfig.SupplyCurrentLowerLimit = kPeakCurrentLimit;
+    currentConfig.SupplyCurrentLowerLimit = kContinousCurrentLimit;
     currentConfig.SupplyCurrentLowerTime = kPeakCurrentDuration;
     leftMotorConfig.CurrentLimits = currentConfig;
     rightMotorConfig.CurrentLimits = currentConfig;
