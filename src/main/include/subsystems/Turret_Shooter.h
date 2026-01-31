@@ -10,6 +10,7 @@
 // #include <ctre/phoenix6/TalonFX.hpp>
 #include <frc/motorcontrol/PWMMotorController.h>
 #include <ctre/phoenix6/TalonFXS.hpp>
+#include <ctre/phoenix6/controls/Follower.hpp>
 #include <units/angle.h>
 #include <units/velocity.h>
 #include <units/acceleration.h>
@@ -23,6 +24,7 @@
 #include <frc2/command/PIDSubsystem.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
+
 
 
 namespace Turret_ShooterConstants {
@@ -52,7 +54,7 @@ private:
   double shooterSpeed = 0.0;
   double newShooterSpeed = 0.0;
 
-  double kP = 0.005;
+  double kP = 0.3;
   double kI = 0.0;
   double kD = 0.0;
   double kS = 0.0;
