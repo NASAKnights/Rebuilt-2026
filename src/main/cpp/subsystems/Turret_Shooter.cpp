@@ -21,7 +21,8 @@ Turret_Shooter::Turret_Shooter()
     motorSlot0Configs.kV = kV;
     leftMotorConfig.Slot0 = motorSlot0Configs;
     rightMotorConfig.Slot0 = motorSlot0Configs;
-
+    m_leftMotor.SetNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Coast);
+    m_rightMotor.SetNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Coast);
     ctre::phoenix6::configs::CurrentLimitsConfigs currentConfig{};
     currentConfig.SupplyCurrentLimitEnable = kEnableCurrentLimit;
     currentConfig.SupplyCurrentLimit = kPeakCurrentLimit;
