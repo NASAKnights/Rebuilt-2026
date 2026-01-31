@@ -24,6 +24,13 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 
+
+namespace Turret_ShooterConstants {
+
+  static const int kMotorIdLeft = 1;
+  static const int kMotorIdRight = 3;
+}
+
 class Turret_Shooter : public frc2::SubsystemBase
 {
 public:
@@ -35,8 +42,8 @@ public:
   void SetSpeed(units::meters_per_second_t speed); // speed of the ball leaving the shooter
 
 private:
-  ctre::phoenix6::hardware::TalonFXS m_leftMotor{kMotorIdLeft};
-  ctre::phoenix6::hardware::TalonFXS m_rightMotor{kMotorIdRight};
+  ctre::phoenix6::hardware::TalonFXS m_leftMotor{Turret_ShooterConstants::kMotorIdLeft};
+  ctre::phoenix6::hardware::TalonFXS m_rightMotor{Turret_ShooterConstants::kMotorIdRight};
 
   static constexpr units::inch_t kFlywheelDiameter = units::inch_t{2.625};
   static constexpr int kGearRatio = 2;
