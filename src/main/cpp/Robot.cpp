@@ -262,6 +262,31 @@ void Robot::BindCommands()
     //             m_elevator.Zero();
     //             return;
     //         })));
+    
+    frc2::JoystickButton(&m_operatorController,5)
+        .OnTrue(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { return m_TurretShooter.RunIndexerAndSpindexer(); })))
+        .OnFalse(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { return m_TurretShooter.StopIndexerAndSpindexer(); })));
+
+    frc2::JoystickButton(&m_operatorController,6)
+        .OnTrue(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { return m_TurretIntake.Intake(); })))
+        .OnTrue(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { return m_TurretIntake.retractIntake(); })));
+
+    frc2::JoystickButton(&m_operatorController,1)
+        .OnTrue(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { return m_TurretShooter.ChangeHoodAngle(0.5); })))
+        .OnFalse(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { return m_TurretShooter.ChangeHoodAngle(0); })));
+    
 }
 
 void Robot::DisabledPeriodic()

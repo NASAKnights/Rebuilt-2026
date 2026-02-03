@@ -18,6 +18,8 @@
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <ctre/phoenix6/CANcoder.hpp>
 
+#include <frc/Servo.h>
+
 #include <rev/SparkBase.h>
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/PIDSubsystem.h>
@@ -37,9 +39,12 @@ public:
   void StopMotors();
   void SetSpeed();
   void NewSetSpeed();
-  void basicSlowShoot();
+  void BasicSlowShoot();
+  void ChangeHoodAngle(double HoodAngle);
+
 
   void RunIndexerAndSpindexer();
+  void StopIndexerAndSpindexer();
 
   double max_speed = 5000; // need to change to actual value we want
   double min_speed = -5000;
@@ -53,12 +58,14 @@ private:
   rev::spark::SparkMax m_backMotor{15, rev::spark::SparkLowLevel::MotorType::kBrushless};
   
   rev::spark::SparkMax m_indexerMotor{16, rev::spark::SparkLowLevel::MotorType::kBrushless};
+
+  frc::Servo VariableHoodServo{17};
   
   rev::spark::SparkBaseConfig followerShooterMotorConfig;
   rev::spark::SparkBaseConfig mainShooterMotorConfig;
   rev::spark::SparkBaseConfig backShooterMotorConfig;
 
-  ctre::phoenix6::hardware::TalonFX m_spindexerMotor{17};
+  ctre::phoenix6::hardware::TalonFX m_spindexerMotor{0};
   
   rev::spark::SparkClosedLoopController mainMotorController = m_mainShooterMotor.GetClosedLoopController();
   rev::spark::SparkClosedLoopController backMotorController = m_backMotor.GetClosedLoopController();
@@ -70,6 +77,8 @@ private:
 
   double shooterSpeed = 0.0;
   double newShooterSpeed = 0.0;
+
+  double Angle = 0.0;
 
   double kP = 0.005;
   double kI = 0.0;

@@ -20,7 +20,6 @@ public:
   void Outtake();
   void StopIntake();
   void retractIntake();
-  void extendIntake();
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.

@@ -103,15 +103,25 @@ void Turret_Shooter::NewSetSpeed()
 
 void Turret_Shooter::RunIndexerAndSpindexer()
 {
-    m_indexerMotor.Set(0.3);
-    m_spindexerMotor.Set(0.6);
+    m_indexerMotor.Set(0.3); //TODO change to correct speed
+    m_spindexerMotor.Set(0.6); //TODO change to correct speed
 }
 
-void Turret_Shooter::basicSlowShoot()
+void Turret_Shooter::StopIndexerAndSpindexer()
+{
+    m_indexerMotor.Set(0.0);
+    m_spindexerMotor.Set(0.0);
+}
+
+void Turret_Shooter::BasicSlowShoot()
 {
     m_mainShooterMotor.Set(0.3);
 }
 
+void Turret_Shooter::ChangeHoodAngle(double HoodAngle)
+{
+    VariableHoodServo.Set(HoodAngle);
+}
 
 // This method will be called once per scheduler run
 void Turret_Shooter::Periodic()

@@ -31,6 +31,8 @@
 #include "subsystems/SwerveDrive.hpp"
 #include "subsystems/Elevator.h"
 #include "subsystems/Wrist.h"
+#include "subsystems/Turret_Shooter.h"
+#include "subsystems/TurretIntake.h"
 
 #include <units/angular_velocity.h>
 #include <units/velocity.h>
@@ -130,9 +132,13 @@ private:
 
     frc2::CommandPtr autoWheelOffsetsCommand = AutoWheelOffsets(&m_swerveDrive).ToPtr().IgnoringDisable(true);
 
+
+    
     // Robot Container methods
     void CreateRobot();
     void BindCommands();
+    Turret_Shooter m_TurretShooter;
+    TurretIntake m_TurretIntake;
 
     frc::Pose2d autoStartPose;
 
