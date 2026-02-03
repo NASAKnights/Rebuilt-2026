@@ -91,8 +91,8 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
         {}, {.periodic = 0.01, .sendAll = true});
     visionStdDevSub = poseTable->GetDoubleArrayTopic(visionStdDev).Subscribe({}, {.periodic = 0.01, .sendAll = true});
 
-    baseLinkPublisher = poseTable->GetDoubleArrayTopic(baseLink).Publish();
-    timePublisher = poseTable->GetDoubleArrayTopic(timeLinkName).Publish();
+    baseLinkPublisher = poseTable->GetDoubleArrayTopic(baseLink).Publish({.periodic = 0.01, .sendAll = true});
+    timePublisher = poseTable->GetDoubleArrayTopic(timeLinkName).Publish({.periodic = 0.01, .sendAll = true});
 
     SetOffsets();
 
@@ -178,12 +178,16 @@ void SwerveDrive::Periodic()
     {
         SimulationPeriodic();
     }
-    PublishOdometry(m_poseEstimator.GetEstimatedPosition());
+    
+    // Update estimator with latest sensor data FIRST
+    m_poseEstimator.Update(GetHeading(), GetModulePositions());
+    
     if (useVision)
     {
         UpdatePoseEstimate();
     }
-    m_poseEstimator.Update(GetHeading(), GetModulePositions());
+    PublishOdometry(m_poseEstimator.GetEstimatedPosition());
+    
     m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
 
 
@@ -438,7 +442,9 @@ void SwerveDrive::UpdatePoseEstimate()
 
 void SwerveDrive::PublishOdometry(frc::Pose2d odometryPose)
 {
-    double time = nt::Now() / (1e6);
+    int64_t time_us = nt::Now();
+    double time_s = time_us / 1e6;
+    
     Eigen::Vector3d odoRotation =
         Eigen::Vector3d(0.0, 0.0, double(odometryPose.Rotation().Radians()));
     frc::Quaternion odoPoseQ = frc::Quaternion::FromRotationVector(odoRotation);
@@ -449,10 +455,11 @@ void SwerveDrive::PublishOdometry(frc::Pose2d odometryPose)
                              odoPoseQ.Y(),
                              odoPoseQ.Z(),
                              odoPoseQ.W(),
-                             time};
-    baseLinkPublisher.Set(poseDeconstruct, time);
-    double timearr[]{time};
-    timePublisher.Set(timearr, time);
+                             time_s};
+                             
+    baseLinkPublisher.Set(poseDeconstruct, time_us);
+    double timearr[]{time_s};
+    timePublisher.Set(timearr, time_us);
 }
 
 void SwerveDrive::EnableDrive()
