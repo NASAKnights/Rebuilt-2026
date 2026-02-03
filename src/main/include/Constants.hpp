@@ -6,6 +6,7 @@
 #include <numbers>
 
 #include <ctre/phoenix6/controls/NeutralOut.hpp>
+#include <ctre/phoenix6/signals/SpnEnums.hpp>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
@@ -20,6 +21,30 @@
 #include <units/velocity.h>
 
 #include "SDSModuleType.hpp"
+
+namespace FuelConstants {
+    static constexpr int FEEDER_MOTOR_ID = 6;
+    static constexpr int INTAKE_LAUNCHER_MOTOR_ID = 5;
+
+    static constexpr int FEEDER_MOTOR_CURRENT_LIMIT = 60;
+    static constexpr int LAUNCHER_MOTOR_CURRENT_LIMIT = 60;
+
+    static constexpr double INTAKING_FEEDER_VOLTAGE = 12.0;
+    static constexpr double INTAKING_INTAKE_VOLTAGE = 8.5;
+    static constexpr double LAUNCHING_FEEDER_VOLTAGE = -11.0;
+    static constexpr double LAUNCHING_LAUNCHER_VOLTAGE = 10.6;
+    static constexpr double SPIN_UP_FEEDER_VOLTAGE = -6.0;
+    static constexpr double SPIN_UP_SECONDS = 1.0;
+}
+
+namespace OperatorConstants {
+    static constexpr int DRIVER_CONTROLLER_PORT = 0;
+    static constexpr int OPERATOR_CONTROLLER_PORT = 1;
+
+    static constexpr double DRIVE_SCALING = 0.7;
+    static constexpr double ROTATION_SCALING = 0.8;
+}
+
 
 namespace ElectricalConstants
 {
@@ -43,6 +68,13 @@ namespace ElectricalConstants
 
 namespace DriveConstants
 {
+    // static constexpr int LEFT_LEADER_ID = 1;
+    // static constexpr int LEFT_FOLLOWER_ID = 2;
+    // static constexpr int RIGHT_LEADER_ID = 3;
+    // static constexpr int RIGHT_FOLLOWER_ID = 4;
+
+    static constexpr int DRIVE_MOTOR_CURRENT_LIMIT = 60;
+
     const int kDriverPort = 0;
     const int kOperatorPort = 1;
     const int kDebugControllerPort = 2;
@@ -70,11 +102,14 @@ namespace DriveConstants
     // inline constexpr std::string_view mk4i_l2 = "mk4i_l2";
     // inline constexpr std::string_view mk4i_l3 = "mk4i_l3";
 
-    // const SDSModuleType kSDSModule = mk4i_l3;
-    const SDSModuleType kSDSModule = mk4i_l1plus;
+    const SDSModuleType kSDSModule = mk4i_l2plus;
+    // const SDSModuleType kSDSModule = mk4i_l1plus;
 
     const auto kTrackwidthMeters = 0.4_m; // Add to shuffleboard
-    const auto kWheelbaseMeters = 0.4_m;  // Add to shuffleboard
+    const auto kWheelbaseMeters = 0.4_m;
+
+    // const auto kTrackwidthMeters = 0.762_m; // Kitbot 
+    // const auto kWheelbaseMeters = 0.635_m;  
 
     const double kDefaultAxisDeadband = 0.15;
     const units::meters_per_second_t kMaxTranslationalVelocity{4}; // Add to shuffleboard
