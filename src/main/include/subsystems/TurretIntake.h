@@ -6,6 +6,9 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <ctre/phoenix/motorcontrol/can/VictorSPX.h>
+#include <ctre/phoenix6/TalonFX.hpp>
+#include <ctre/phoenix6/CANcoder.hpp>
+#include <rev/SparkMax.h>
 // #include <ctre/phoenix6/configs/Configs.hpp>
 
 class TurretIntake : public frc2::SubsystemBase
@@ -16,6 +19,8 @@ public:
   void Intake();
   void Outtake();
   void StopIntake();
+  void retractIntake();
+  void extendIntake();
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -24,6 +29,7 @@ public:
 
 private:
   ctre::phoenix::motorcontrol::can::VictorSPX m_intakeMotor{8};
+  rev::spark::SparkMax m_secondaryIntakeMotor{9, rev::spark::SparkLowLevel::MotorType::kBrushless};
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

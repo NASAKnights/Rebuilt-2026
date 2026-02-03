@@ -100,6 +100,19 @@ void Turret_Shooter::NewSetSpeed()
         // m_backMotor.SetVoltage(0.9 * m_feedforward.Calculate(newShooterSpeed));
     }
 }
+
+void Turret_Shooter::RunIndexerAndSpindexer()
+{
+    m_indexerMotor.Set(0.3);
+    m_spindexerMotor.Set(0.6);
+}
+
+void Turret_Shooter::basicSlowShoot()
+{
+    m_mainShooterMotor.Set(0.3);
+}
+
+
 // This method will be called once per scheduler run
 void Turret_Shooter::Periodic()
 {

@@ -25,3 +25,13 @@ void TurretIntake::StopIntake()
 {
     m_intakeMotor.Set(ctre::phoenix::motorcontrol::ControlMode::PercentOutput, 0.0);
 }
+
+void TurretIntake::extendIntake()
+{
+
+}
+
+void TurretIntake::retractIntake()
+{
+    
+}
