@@ -31,8 +31,8 @@ Turret_Shooter::Turret_Shooter()
     leftMotorConfig.CurrentLimits = currentConfig;
     rightMotorConfig.CurrentLimits = currentConfig;
 
-    leftMotorConfig.MotorOutput.Inverted = false;
-    rightMotorConfig.MotorOutput.Inverted = true;
+    leftMotorConfig.MotorOutput.Inverted = true;
+    rightMotorConfig.MotorOutput.Inverted = false;
 
     ctre::phoenix::StatusCode leftStatus = m_leftMotor.GetConfigurator().Apply(leftMotorConfig);
     ctre::phoenix::StatusCode rightStatus = m_rightMotor.GetConfigurator().Apply(rightMotorConfig);
@@ -56,6 +56,7 @@ Turret_Shooter::Turret_Shooter()
     frc::SmartDashboard::PutNumber("Shooter/Ball_Speed_Manual_Set", 0.0);
     frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_Speed", 0.0);
     frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Voltage", 0.0);
 }
 
 void Turret_Shooter::SetSpeed(units::meters_per_second_t ballSpeed) {
@@ -81,9 +82,10 @@ void Turret_Shooter::Periodic()
 {
     // printf("hi 122 122 122 122 122 nasa knights nasa knights 122 122 122 122\n");
     frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_Speed", m_leftMotor.GetVelocity().GetValue().value()); // left and right motors are same speed
-    auto ballSpeed = (m_leftMotor.GetVelocity().GetValue().value() * 2.0 * std::numbers::pi * kFlywheelDiameter * kGearRatio) / 4.0;
-    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed", ballSpeed.value()); // left and right motors are same speed
-    // SetSpeed(units::meters_per_second_t{0.1});
+    auto ballSpeed = (m_leftMotor.GetVelocity().GetValue().value() * 2.0 * std::numbers::pi * units::meter_t{kFlywheelDiameter}.value() * kGearRatio) / 4.0;
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed", ballSpeed); // left and right motors are same speed
+    // SetSpeed(units::meters_per_second_t{0.1});s
     SetSpeed(units::meters_per_second_t{frc::SmartDashboard::GetNumber("Shooter/Ball_Speed_Manual_Set", 0.0)});
     // frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Voltage", m_leftMotor.GetMotorVoltage().GetValue().value());
 }

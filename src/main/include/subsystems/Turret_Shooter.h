@@ -54,12 +54,12 @@ private:
   double shooterSpeed = 0.0;
   double newShooterSpeed = 0.0;
 
-  double kP = 0.3;
+  double kP = 0.003;
   double kI = 0.0;
   double kD = 0.0;
-  double kS = 0.0;
+  double kS = 0.6;
   double kA = 0.0;
-  double kV = 0.0;
+  double kV = 0.04;
 
   const int kMotorIdLeft = 1;
   const int kMotorIdRight = 3;
