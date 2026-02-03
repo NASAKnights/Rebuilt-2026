@@ -259,6 +259,12 @@ void Turret::Periodic()
         fb = m_controller.Calculate(GetMeasurement().value());
         ff = m_feedforward.Calculate(angle, velocity);
         v = units::volt_t{fb} + ff;
+        if(v > units::volt_t{2.0}){
+            v = 2.0_V;
+        }
+        else if(v < -2.0_V){
+            v = -2.0_V;
+        }
         // units::degrees_per_second_t robotVel = units::degrees_per_second_t{frc::SmartDashboard::GetNumber("Angular velocity", 0.0)};
         // auto turretVel = GetVelocity();
 

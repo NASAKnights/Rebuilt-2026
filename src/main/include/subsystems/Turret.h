@@ -73,7 +73,7 @@ namespace TurretConstants
 
   const std::array<double, 2> kSimNoise = {0.0};
   const frc::DCMotor kSimMotor = frc::DCMotor::KrakenX60(1);
-  const double kGearRatio = 43.0; // gear ratio for motor to arm
+  const double kGearRatio = 43.0 * 0.75; // gear ratio for motor to arm
   const units::moment_of_inertia::kilogram_square_meter_t kmoi =
       units::moment_of_inertia::kilogram_square_meter_t(0.06742); // I = MR^2
   const units::length::meter_t kTurretRadius = units::length::meter_t(0.3048);

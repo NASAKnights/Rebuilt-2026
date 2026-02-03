@@ -193,7 +193,7 @@ void Robot::CreateRobot()
                                                        DriveConstants::kDefaultAxisDeadband);
             auto leftYAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(0),
                                                        DriveConstants::kDefaultAxisDeadband);
-            auto rightXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(2),
+            auto rightXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(4),
                                                         DriveConstants::kDefaultAxisDeadband);
 
             // m_swerveDrive.WeightedDriving(approach, leftXAxis, leftYAxis, rightXAxis, targetKey);
@@ -222,7 +222,7 @@ void Robot::CreateRobot()
     //             10_ms, 2_ms);
     AddPeriodic([this]
                 { m_turret.Periodic(); },
-                5_ms, 3_ms);
+                5_ms, 1_ms);
 
     // Configure the button bindings
     BindCommands();

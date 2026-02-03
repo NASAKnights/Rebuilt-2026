@@ -116,7 +116,7 @@ private:
 
   ctre::phoenix6::CANBus m_canBus;
   // ctre::phoenix6::hardware::Pigeon2 m_pigeon{2};
-  ctre::phoenix6::hardware::Pigeon2 m_pigeon{2, "NKCANivore"};
+  // ctre::phoenix6::hardware::Pigeon2 m_pigeon{2, "NKCANivore"};
   // ctre::phoenix6::hardware::Pigeon2 m_pigeon{2};
 
   std::array<SwerveModule, 4> modules;
@@ -165,7 +165,7 @@ private:
 
   /* Simulation */
   frc::Timer m_simTimer;
-  ctre::phoenix6::sim::Pigeon2SimState m_pigeonSim;
+  // ctre::phoenix6::sim::Pigeon2SimState m_pigeonSim;
   frc::Rotation2d m_simAngle;
   bool m_fieldRelative = true;
 };

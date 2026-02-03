@@ -26,37 +26,37 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
                                                                                                                                             frc::Rotation2d(0_deg), // Initial pose rotation, will be updated
                                                                                                                                             {modules[0].GetPosition(), modules[1].GetPosition(), modules[2].GetPosition(),
                                                                                                                                              modules[3].GetPosition()},
-                                                                                                                                            frc::Pose2d()},
-      m_pigeonSim{m_pigeon}
+                                                                                                                                            frc::Pose2d()}
+    //   m_pigeonSim{m_pigeon}
 {
 
     // Add a function that loads the Robot Preferences, including
     // offsets, Module positions, max speed, wheel diameter
 
     // GYRO INITIALIZATION AND FALLBACK LOGIC
-    auto pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
+    // auto pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
     // Try to refresh a few times to be sure
-    if (pigeonStatus != ctre::phoenix::StatusCode::OK) {
-        frc::Wait(0.1_s);
-        pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
-    }
+    // if (pigeonStatus != ctre::phoenix::StatusCode::OK) {
+    //     frc::Wait(0.1_s);
+    //     pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
+    // }
 
-    if (pigeonStatus == ctre::phoenix::StatusCode::OK) {
-        m_usingPigeon = true;
-        std::cout << "SwerveDrive: Successfully connected to Pigeon2." << std::endl;
-        frc::SmartDashboard::PutString("Gyro Source", "Pigeon");
-    } else {
-        m_usingPigeon = false;
-        std::cout << "SwerveDrive: Failed to connect to Pigeon2 (Status: " << pigeonStatus.GetName() << "). Falling back to NavX." << std::endl;
+    // if (pigeonStatus == ctre::phoenix::StatusCode::OK) {
+    //     m_usingPigeon = true;
+    //     std::cout << "SwerveDrive: Successfully connected to Pigeon2." << std::endl;
+    //     frc::SmartDashboard::PutString("Gyro Source", "Pigeon");
+    // } else {
+    //     m_usingPigeon = false;
+    //     std::cout << "SwerveDrive: Failed to connect to Pigeon2 (Status: " << pigeonStatus.GetName() << "). Falling back to NavX." << std::endl;
         
-        if (navx.IsConnected()) {
-             std::cout << "SwerveDrive: NavX is connected." << std::endl;
-             frc::SmartDashboard::PutString("Gyro Source", "NavX");
-        } else {
-             std::cout << "SwerveDrive: CRITICAL - NavX is ALSO disconnected!" << std::endl;
-             frc::SmartDashboard::PutString("Gyro Source", "NONE");
-        }
-    }
+    //     if (navx.IsConnected()) {
+    //          std::cout << "SwerveDrive: NavX is connected." << std::endl;
+    //          frc::SmartDashboard::PutString("Gyro Source", "NavX");
+    //     } else {
+    //          std::cout << "SwerveDrive: CRITICAL - NavX is ALSO disconnected!" << std::endl;
+    //          frc::SmartDashboard::PutString("Gyro Source", "NONE");
+    //     }
+    // }
 
     kSwerveKinematics = frc::SwerveDriveKinematics<4U>{
         {DriveConstants::kFrontLeftPosition, DriveConstants::kFrontRightPosition,
@@ -68,7 +68,7 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
 
     // navx.Calibrate();
     navx.Reset();
-    m_pigeon.SetYaw(0_deg);
+    // m_pigeon.SetYaw(0_deg);
     
     // Reseed the pose estimator with the correct initial rotation
     m_poseEstimator.ResetPosition(GetHeading(), GetModulePositions(), frc::Pose2d());
@@ -199,8 +199,8 @@ void SwerveDrive::SimulationPeriodic()
     units::angle::degree_t delta = 0_deg;
     
     if (m_usingPigeon) {
-       delta = m_pigeon.GetAngularVelocityZWorld().GetValue() * dt;
-       m_pigeonSim.AddYaw(delta);
+    //    delta = m_pigeon.GetAngularVelocityZWorld().GetValue() * dt;
+    //    m_pigeonSim.AddYaw(delta);
     } else {
        // Assuming navx sim support, but simplified for now.
        // Without pigeon loop-back in sim, we might need manual integration or navx sim support.
@@ -249,7 +249,7 @@ void SwerveDrive::Drive(frc::ChassisSpeeds speeds)
         if constexpr (frc::RobotBase::IsSimulation())
         {
             if (m_usingPigeon) {
-                m_pigeonSim.SetAngularVelocityZ(speeds.omega);
+                // m_pigeonSim.SetAngularVelocityZ(speeds.omega);
             }
         }
 
@@ -293,7 +293,7 @@ frc::Rotation2d SwerveDrive::GetHeading()
     }
     
     if (m_usingPigeon) {
-        return frc::Rotation2d(m_pigeon.GetYaw().GetValue());
+        // return frc::Rotation2d(m_pigeon.GetYaw().GetValue());
         // Note: Pigeon2 is CCW+, so this matches standard NWU.
     } else {
         // NavX is CW+ by default, need to negate for NWU?
@@ -311,7 +311,7 @@ void SwerveDrive::ResetHeading()
     if (enable == true)
     {
         navx.Reset();
-        m_pigeon.SetYaw(0_deg);
+        // m_pigeon.SetYaw(0_deg);
         m_simAngle = frc::Rotation2d();
     }
 }
