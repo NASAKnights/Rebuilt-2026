@@ -107,6 +107,8 @@ public:
   void SetOffsets();
   void WeightedDriving(bool approach, double leftXAxis, double leftYAxis, double rightXAxis, std::string poiKey); // DEPRECATED
 
+  void ValidShootingPose();
+
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

@@ -536,3 +536,29 @@ void SwerveDrive::SetOffsets()
         modules[i].SetOffset(offsets[i]);
     }
 }
+
+void SwerveDrive::ValidShootingPose()
+{
+    /*
+    alliance = frc::DriverStation::GetAlliance();
+    hub color = blue or red;
+    if alliance == hub color:
+
+    if robotPose is within alliance zone
+        set goal to be hub
+    elif robotPose is within zone top middle and right zone
+        set goal to be top left of alliance zone
+    elif robotPose is within zone bottom middle and left zone
+        set goal to be bottom left of alliance zone
+    
+    
+    if robotPose
+     shoot = no
+     else shoot = yes
+    
+
+    
+    
+    
+    */
+}
