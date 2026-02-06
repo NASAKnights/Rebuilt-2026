@@ -41,7 +41,7 @@
       },
       "nextControl": {
         "x": 7.56007696764458,
-        "y": 0.9162494494668983
+        "y": 0.9162494494668982
       },
       "isLocked": false,
       "linkedName": null
@@ -77,7 +77,7 @@
     },
     {
       "name": "shoot",
-      "waypointRelativePos": 1.9871381283662477,
+      "waypointRelativePos": 1.4120603015075328,
       "endWaypointRelativePos": 3.0,
       "command": null
     }

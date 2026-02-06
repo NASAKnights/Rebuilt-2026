@@ -167,8 +167,8 @@
   "eventMarkers": [
     {
       "name": "shoot",
-      "waypointRelativePos": 0.7,
-      "endWaypointRelativePos": 1.0,
+      "waypointRelativePos": 0.3752093802345057,
+      "endWaypointRelativePos": 1.3400335008375206,
       "command": {
         "type": "named",
         "data": {
@@ -179,19 +179,19 @@
     {
       "name": "intake",
       "waypointRelativePos": 2.975047688509874,
-      "endWaypointRelativePos": 4.0792190305206475,
+      "endWaypointRelativePos": 4.395309882747068,
       "command": null
     },
     {
       "name": "shoot",
-      "waypointRelativePos": 5.4102894973070015,
-      "endWaypointRelativePos": 7.693503141831239,
+      "waypointRelativePos": 5.306532663316583,
+      "endWaypointRelativePos": 8.0,
       "command": null
     },
     {
       "name": "intake",
-      "waypointRelativePos": 5.878366247755833,
-      "endWaypointRelativePos": 6.365013464991025,
+      "waypointRelativePos": 5.855946398659967,
+      "endWaypointRelativePos": 6.5125628140703515,
       "command": null
     },
     {

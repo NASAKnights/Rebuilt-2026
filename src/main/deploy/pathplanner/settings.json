@@ -28,5 +28,9 @@
   "brModuleY": -0.273,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Intake\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.45,\"y\":0.0},\"size\":{\"width\":0.925,\"length\":0.2},\"borderRadius\":0.05,\"strokeWidth\":0.06,\"filled\":false}}",
+    "{\"name\":\"Turret\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":-0.3,\"y\":0.3},\"radius\":0.15,\"strokeWidth\":0.06,\"filled\":false}}",
+    "{\"name\":\"Climber\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.0,\"y\":-0.35},\"size\":{\"width\":0.2,\"length\":0.6},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
+  ]
 }

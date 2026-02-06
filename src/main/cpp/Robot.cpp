@@ -275,14 +275,14 @@ void Robot::BindCommands()
         .OnTrue(frc2::CommandPtr(
             frc2::InstantCommand([this]
                                         { return m_TurretIntake.Intake(); })))
-        .OnTrue(frc2::CommandPtr(
+        .OnFalse(frc2::CommandPtr(
             frc2::InstantCommand([this]
                                         { return m_TurretIntake.retractIntake(); })));
 
     frc2::JoystickButton(&m_operatorController,1)
         .OnTrue(frc2::CommandPtr(
             frc2::InstantCommand([this]
-                                        { return m_TurretShooter.ChangeHoodAngle(0.5); })))
+                                        { return m_TurretShooter.ChangeHoodAngle(0.004); }))) //0.004 is the smallest movement it can do
         .OnFalse(frc2::CommandPtr(
             frc2::InstantCommand([this]
                                         { return m_TurretShooter.ChangeHoodAngle(0); })));

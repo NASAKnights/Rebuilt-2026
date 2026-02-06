@@ -17,6 +17,8 @@ Turret_Shooter::Turret_Shooter()
 
     mainShooterMotorConfig.Inverted(true);
 
+        VariableHoodServo.SetBounds(units::microsecond_t{2000},units::microsecond_t{1550},units::microsecond_t{1500},units::microsecond_t{1450},units::microsecond_t{1000});
+
     // mainShooterMotorConfig.closedLoop
     //     .P(kP)
     //     .I(kI)
