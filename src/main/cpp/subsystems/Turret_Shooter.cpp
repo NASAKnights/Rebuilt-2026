@@ -6,103 +6,100 @@
 
 Turret_Shooter::Turret_Shooter()
 {
+    ctre::phoenix6::configs::TalonFXSConfiguration leftMotorConfig{};
+    ctre::phoenix6::configs::TalonFXSConfiguration rightMotorConfig{};
+    // ctre::phoenix6::controls::Follower LeftFollower{m_rightMotor.GetDeviceID(), true};
+    leftMotorConfig.Commutation.WithMotorArrangement(ctre::phoenix6::signals::MotorArrangementValue::Minion_JST);
+    rightMotorConfig.Commutation.WithMotorArrangement(ctre::phoenix6::signals::MotorArrangementValue::Minion_JST);
+    // m_leftMotor.SetControl(LeftFollower);
+    ctre::phoenix6::configs::Slot0Configs motorSlot0Configs{};
+    motorSlot0Configs.kP = kP;
+    motorSlot0Configs.kI = kI;
+    motorSlot0Configs.kD = kD;
+    motorSlot0Configs.kS = kS;
+    motorSlot0Configs.kA = kA;
+    motorSlot0Configs.kV = kV;
+    leftMotorConfig.Slot0 = motorSlot0Configs;
+    rightMotorConfig.Slot0 = motorSlot0Configs;
+    m_leftMotor.SetNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Coast);
+    m_rightMotor.SetNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Coast);
+    ctre::phoenix6::configs::CurrentLimitsConfigs currentConfig{};
+    currentConfig.SupplyCurrentLimitEnable = kEnableCurrentLimit;
+    currentConfig.SupplyCurrentLimit = kPeakCurrentLimit;
+    currentConfig.SupplyCurrentLowerLimit = kContinousCurrentLimit;
+    currentConfig.SupplyCurrentLowerTime = kPeakCurrentDuration;
+    leftMotorConfig.CurrentLimits = currentConfig;
+    rightMotorConfig.CurrentLimits = currentConfig;
 
-    mainShooterMotorConfig.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
-    followerShooterMotorConfig.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
-    backShooterMotorConfig.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
+    leftMotorConfig.MotorOutput.Inverted = true;
+    rightMotorConfig.MotorOutput.Inverted = false;
 
-    mainShooterMotorConfig.SmartCurrentLimit(30);
-    followerShooterMotorConfig.SmartCurrentLimit(30);
-    backShooterMotorConfig.SmartCurrentLimit(30);
+    ctre::phoenix::StatusCode leftStatus = m_leftMotor.GetConfigurator().Apply(leftMotorConfig);
+    ctre::phoenix::StatusCode rightStatus = m_rightMotor.GetConfigurator().Apply(rightMotorConfig);
 
-    mainShooterMotorConfig.Inverted(true);
+    frc::SmartDashboard::PutBoolean("Shooter/Left_Motor_Status", false);
+    frc::SmartDashboard::PutBoolean("Shooter/Right_Motor_Status", false);
 
-    // mainShooterMotorConfig.closedLoop
-    //     .P(kP)
-    //     .I(kI)
-    //     .D(kD)
-    //     .OutputRange(kMinOutput, kMaxOutput);
-    // followerShooterMotorConfig.closedLoop
-    //     .P(kP)
-    //     .I(kI)
-    //     .D(kD)
-    //     .OutputRange(kMinOutput, kMaxOutput);
-    // backShooterMotorConfig.closedLoop
-    //     .P(kP * 10)
-    //     .I(kI)
-    //     .D(kD)
-    //     .OutputRange(kMinOutput, kMaxOutput);
+    
+    while (!leftStatus.IsOK()) {
+        ctre::phoenix::StatusCode leftStatus = m_leftMotor.GetConfigurator().Apply(leftMotorConfig);
+    }
+    while (!rightStatus.IsOK()) {
+        ctre::phoenix::StatusCode rightStatus = m_rightMotor.GetConfigurator().Apply(rightMotorConfig);
+    }
+    
 
-    m_followerShooterMotor.Configure(followerShooterMotorConfig, rev::spark::SparkBase::ResetMode::kNoResetSafeParameters, rev::spark::SparkBase::PersistMode::kPersistParameters);
-    m_mainShooterMotor.Configure(mainShooterMotorConfig, rev::spark::SparkBase::ResetMode::kNoResetSafeParameters, rev::spark::SparkBase::PersistMode::kPersistParameters);
-    m_backMotor.Configure(backShooterMotorConfig, rev::spark::SparkBase::ResetMode::kNoResetSafeParameters, rev::spark::SparkBase::PersistMode::kPersistParameters);
+    frc::SmartDashboard::PutBoolean("Shooter/Left_Motor_Status", leftStatus.IsOK());
+    frc::SmartDashboard::PutBoolean("Shooter/Right_Motor_Status", rightStatus.IsOK());
 
-    frc::SmartDashboard::PutNumber("Shooter_Speed", shooterSpeed);
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Ball_Speed_MPS", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_RPM", 0.0);
+
+    frc::SmartDashboard::PutBoolean("Shooter/Ball_Speed_Manual_Override", false);
+    frc::SmartDashboard::PutNumber("Shooter/Ball_Speed_Manual_Set_MPS", 0.0);
+
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_RPM", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed_MPS", 0.0);
+
+    frc::SmartDashboard::PutNumber("Shooter/Left_Motor_Voltage", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Right_Motor_Voltage", 0.0);
 }
 
-void Turret_Shooter::SetSpeed()
-{
-
-    shooterSpeed = frc::SmartDashboard::GetNumber("Shooter_Speed", 0.0);
-
-    if (min_speed <= shooterSpeed <= max_speed)
-    {
-        mainMotorController.SetReference(shooterSpeed, rev::spark::SparkLowLevel::ControlType::kVelocity);
-        backMotorController.SetReference(shooterSpeed, rev::spark::SparkLowLevel::ControlType::kVelocity);
-    }
-    else if (min_speed > shooterSpeed)
-    {
-        mainMotorController.SetReference(min_speed, rev::spark::SparkLowLevel::ControlType::kVelocity);
-        backMotorController.SetReference(min_speed, rev::spark::SparkLowLevel::ControlType::kVelocity);
-    }
-    else if (max_speed < shooterSpeed)
-    {
-        mainMotorController.SetReference(max_speed, rev::spark::SparkLowLevel::ControlType::kVelocity);
-        backMotorController.SetReference(max_speed, rev::spark::SparkLowLevel::ControlType::kVelocity);
-    }
-
-    // mainMotorController.SetReference(shooterSpeed, rev::spark::SparkLowLevel::ControlType::kVelocity);
+void Turret_Shooter::SetSpeed(units::meters_per_second_t ballSpeed) {
+    units::turns_per_second_t motorSpeed = (kFlyWheelVelocityGain * ballSpeed * units::radian_t{1} * 4.0) / (kFlywheelDiameter * kGearRatio);
+    auto motorRequest = ctre::phoenix6::controls::VelocityVoltage{motorSpeed};
+    ctre::phoenix::StatusCode leftStatus = m_leftMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
+    ctre::phoenix::StatusCode rightStatus = m_rightMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
+    frc::SmartDashboard::PutBoolean("Shooter/Left_Motor_Status", leftStatus.IsOK());
+    frc::SmartDashboard::PutBoolean("Shooter/Right_Motor_Status", rightStatus.IsOK());
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Ball_Speed_MPS", ballSpeed.value());
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_RPM", motorSpeed.value() * 60.0);
 }
 
 void Turret_Shooter::StopMotors()
 {
-    shooterSpeed = 0.0;
-    mainMotorController.SetReference(0, rev::spark::SparkLowLevel::ControlType::kVelocity);
-    backMotorController.SetReference(0, rev::spark::SparkLowLevel::ControlType::kVelocity);
-    m_mainShooterMotor.Set(0.);
-    m_backMotor.Set(0.);
+    auto motorRequest = ctre::phoenix6::controls::VelocityVoltage{0_tps};
+    auto motorSpeed = units::radians_per_second_t{0.0};
+    m_leftMotor.SetControl(motorRequest.WithVelocity(motorSpeed));
+    m_rightMotor.SetControl(motorRequest.WithVelocity(motorSpeed));
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Ball_Speed_MPS", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_RPM", 0.0);
 }
 
-void Turret_Shooter::NewSetSpeed()
-{
-    newShooterSpeed = frc::SmartDashboard::GetNumber("Shooter_Speed", 0.0);
-
-    if (m_mainShooterMotor.GetEncoder().GetVelocity() >= newShooterSpeed)
-    {
-        // StopMotors();
-        m_mainShooterMotor.Set(0.);
-    }
-    else if (m_mainShooterMotor.GetEncoder().GetVelocity() < newShooterSpeed)
-    {
-        m_mainShooterMotor.Set(0.9);
-    }
-
-    if (m_backMotor.GetEncoder().GetVelocity() >= newShooterSpeed)
-    {
-        // StopMotors();
-        m_backMotor.Set(0.475);
-    }
-    else if (m_backMotor.GetEncoder().GetVelocity() < newShooterSpeed)
-    {
-        m_backMotor.Set(0.9);
-        // Controls a motor with the output of the BangBang controller and a feedforward
-        // Shrinks the feedforward slightly to avoid overspeeding the shooter
-        // m_backMotor.SetVoltage(0.9 * m_feedforward.Calculate(newShooterSpeed));
-    }
-}
-// This method will be called once per scheduler run
 void Turret_Shooter::Periodic()
 {
+    frc::SmartDashboard::PutNumber("Shooter/Left_Motor_Voltage", m_leftMotor.GetMotorVoltage().GetValue().value());
+    frc::SmartDashboard::PutNumber("Shooter/Right_Motor_Voltage", m_rightMotor.GetMotorVoltage().GetValue().value());
 
-    frc::SmartDashboard::PutNumber("Shooter/actual speed", m_mainShooterMotor.GetEncoder().GetVelocity());
+    // left and right motors are same speed
+    units::turns_per_second_t motorSpeed = m_leftMotor.GetVelocity().GetValue();
+    units::meters_per_second_t ballSpeed = motorSpeed * (kFlywheelDiameter * kGearRatio) / (kFlyWheelVelocityGain * units::radian_t{1} * 4.0); 
+
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_RPM", motorSpeed.value() * 60.0);
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed_MPS", ballSpeed.value()); 
+
+    bool override = frc::SmartDashboard::GetBoolean("Shooter/Ball_Speed_Manual_Override", false);
+    if (override) {
+        SetSpeed(units::meters_per_second_t{frc::SmartDashboard::GetNumber("Shooter/Ball_Speed_Manual_Set_MPS", 0.0)});
+    }
 }
