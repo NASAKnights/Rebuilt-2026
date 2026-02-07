@@ -26,7 +26,6 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 
 
-
 namespace Turret_ShooterConstants {
 
   static const int kMotorIdLeft = 1;
@@ -51,15 +50,16 @@ private:
   static constexpr int kGearRatio = 2;
   static constexpr units::inch_t kBallDiameter = units::inch_t{5.91};
 
-  double shooterSpeed = 0.0;
-  double newShooterSpeed = 0.0;
-
   double kP = 0.003;
   double kI = 0.0;
   double kD = 0.0;
   double kS = 0.6;
   double kA = 0.0;
   double kV = 0.04;
+
+  // determines how much faster the flywheel needs to spin
+  // so that the exit velocity meets the specified speed 
+  double kFlyWheelVelocityGain = 1.0;
 
   const int kMotorIdLeft = 1;
   const int kMotorIdRight = 3;
@@ -68,7 +68,4 @@ private:
   units::ampere_t kPeakCurrentLimit = units::ampere_t{53};
   units::ampere_t kContinousCurrentLimit = units::ampere_t{40};
   units::second_t kPeakCurrentDuration = units::second_t{0.1};
-
-  double kMinOutput = -1.0;
-  double kMaxOutput = 1.0;
 };

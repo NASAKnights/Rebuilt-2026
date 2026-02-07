@@ -37,8 +37,8 @@ Turret_Shooter::Turret_Shooter()
     ctre::phoenix::StatusCode leftStatus = m_leftMotor.GetConfigurator().Apply(leftMotorConfig);
     ctre::phoenix::StatusCode rightStatus = m_rightMotor.GetConfigurator().Apply(rightMotorConfig);
 
-    frc::SmartDashboard::PutBoolean("Shooter/Left_Status", false);
-    frc::SmartDashboard::PutBoolean("Shooter/Right_Status", false);
+    frc::SmartDashboard::PutBoolean("Shooter/Left_Motor_Status", false);
+    frc::SmartDashboard::PutBoolean("Shooter/Right_Motor_Status", false);
 
     
     while (!leftStatus.IsOK()) {
@@ -49,24 +49,31 @@ Turret_Shooter::Turret_Shooter()
     }
     
 
-    frc::SmartDashboard::PutBoolean("Shooter/Left_Status", leftStatus.IsOK());
-    frc::SmartDashboard::PutBoolean("Shooter/Right_Status", rightStatus.IsOK());
+    frc::SmartDashboard::PutBoolean("Shooter/Left_Motor_Status", leftStatus.IsOK());
+    frc::SmartDashboard::PutBoolean("Shooter/Right_Motor_Status", rightStatus.IsOK());
 
-    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_Speed", 0.0);
-    frc::SmartDashboard::PutNumber("Shooter/Ball_Speed_Manual_Set", 0.0);
-    frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_Speed", 0.0);
-    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed", 0.0);
-    frc::SmartDashboard::PutNumber("Shooter/Voltage", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Ball_Speed_MPS", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_RPM", 0.0);
+
+    frc::SmartDashboard::PutBoolean("Shooter/Ball_Speed_Manual_Override", false);
+    frc::SmartDashboard::PutNumber("Shooter/Ball_Speed_Manual_Set_MPS", 0.0);
+
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_RPM", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed_MPS", 0.0);
+
+    frc::SmartDashboard::PutNumber("Shooter/Left_Motor_Voltage", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Right_Motor_Voltage", 0.0);
 }
 
 void Turret_Shooter::SetSpeed(units::meters_per_second_t ballSpeed) {
-    // auto motorRequest = ctre::phoenix6::controls::VelocityVoltage{0_tps};
-    units::turns_per_second_t motorSpeed = (ballSpeed * units::radian_t{1} * 4.0) / (kFlywheelDiameter * kGearRatio);
+    units::turns_per_second_t motorSpeed = (kFlyWheelVelocityGain * ballSpeed * units::radian_t{1} * 4.0) / (kFlywheelDiameter * kGearRatio);
     auto motorRequest = ctre::phoenix6::controls::VelocityVoltage{motorSpeed};
     ctre::phoenix::StatusCode leftStatus = m_leftMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
-    m_rightMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
-    frc::SmartDashboard::PutBoolean("Shooter/Left_Status", leftStatus.IsOK());
-    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_Speed", motorSpeed.value());
+    ctre::phoenix::StatusCode rightStatus = m_rightMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
+    frc::SmartDashboard::PutBoolean("Shooter/Left_Motor_Status", leftStatus.IsOK());
+    frc::SmartDashboard::PutBoolean("Shooter/Right_Motor_Status", rightStatus.IsOK());
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Ball_Speed_MPS", ballSpeed.value());
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_RPM", motorSpeed.value() * 60.0);
 }
 
 void Turret_Shooter::StopMotors()
@@ -75,17 +82,24 @@ void Turret_Shooter::StopMotors()
     auto motorSpeed = units::radians_per_second_t{0.0};
     m_leftMotor.SetControl(motorRequest.WithVelocity(motorSpeed));
     m_rightMotor.SetControl(motorRequest.WithVelocity(motorSpeed));
-    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_Speed", motorSpeed.value());
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Ball_Speed_MPS", 0.0);
+    frc::SmartDashboard::PutNumber("Shooter/Commanded_Motor_RPM", 0.0);
 }
 
 void Turret_Shooter::Periodic()
 {
-    // printf("hi 122 122 122 122 122 nasa knights nasa knights 122 122 122 122\n");
-    frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_Speed", m_leftMotor.GetVelocity().GetValue().value()); // left and right motors are same speed
-    auto ballSpeed = (m_leftMotor.GetVelocity().GetValue().value() * 2.0 * std::numbers::pi * units::meter_t{kFlywheelDiameter}.value() * kGearRatio) / 4.0;
-    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed", ballSpeed); // left and right motors are same speed
-    // SetSpeed(units::meters_per_second_t{0.1});s
-    SetSpeed(units::meters_per_second_t{frc::SmartDashboard::GetNumber("Shooter/Ball_Speed_Manual_Set", 0.0)});
-    // frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed", 0.0);
-    frc::SmartDashboard::PutNumber("Shooter/Voltage", m_leftMotor.GetMotorVoltage().GetValue().value());
+    frc::SmartDashboard::PutNumber("Shooter/Left_Motor_Voltage", m_leftMotor.GetMotorVoltage().GetValue().value());
+    frc::SmartDashboard::PutNumber("Shooter/Right_Motor_Voltage", m_rightMotor.GetMotorVoltage().GetValue().value());
+
+    // left and right motors are same speed
+    units::turns_per_second_t motorSpeed = m_leftMotor.GetVelocity().GetValue();
+    units::meters_per_second_t ballSpeed = motorSpeed * (kFlywheelDiameter * kGearRatio) / (kFlyWheelVelocityGain * units::radian_t{1} * 4.0); 
+
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Motor_RPM", motorSpeed.value() * 60.0);
+    frc::SmartDashboard::PutNumber("Shooter/Actual_Ball_Speed_MPS", ballSpeed.value()); 
+
+    bool override = frc::SmartDashboard::GetBoolean("Shooter/Ball_Speed_Manual_Override", false);
+    if (override) {
+        SetSpeed(units::meters_per_second_t{frc::SmartDashboard::GetNumber("Shooter/Ball_Speed_Manual_Set_MPS", 0.0)});
+    }
 }
