@@ -23,6 +23,7 @@ void Robot::RobotInit()
     frc::SmartDashboard::PutData("AddPOI", addPOICommand.get());
     frc::SmartDashboard::PutData("RemovePOI", removePOICommand.get());
     frc::SmartDashboard::PutData("Set", autoWheelOffsetsCommand.get());
+    frc::SmartDashboard::PutNumber("hoodAngle", 1.0);
 
     autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
 
@@ -237,16 +238,16 @@ void Robot::BindCommands()
 {
 
     // --------------DRIVER BUTTONS----------------------------------
-    frc2::JoystickButton(&m_driverController, 1)
+    frc2::JoystickButton(&m_driverController, 3)
         .OnTrue(frc2::CommandPtr(
             frc2::InstantCommand([this]
                                  { return m_swerveDrive.ResetHeading(); })));
 
-    frc2::JoystickButton(&m_driverController, 3)
-        .OnTrue(scoreClosest.get())
-        .OnFalse(frc2::CommandPtr(
-            frc2::InstantCommand([this]
-                                 { return m_pathfind.Cancel(); })));
+    // frc2::JoystickButton(&m_driverController, 3)
+    //     .OnTrue(scoreClosest.get())
+    //     .OnFalse(frc2::CommandPtr(
+    //         frc2::InstantCommand([this]
+    //                              { return m_pathfind.Cancel(); })));
 
     // --------------OPERATOR BUTTONS--------------------------------
 
@@ -257,6 +258,15 @@ void Robot::BindCommands()
     //             m_elevator.Zero();
     //             return;
     //         })));
+
+    frc2::JoystickButton(&m_operatorController,1)
+        .OnTrue(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { double hoodAngle = 0.7;
+                                            return m_turret.ChangeHoodAngle(hoodAngle); }))) //0.004 is the smallest movement it can do
+        .OnFalse(frc2::CommandPtr(
+            frc2::InstantCommand([this]
+                                        { return m_turret.ChangeHoodAngle(0); })));
 }
 
 void Robot::DisabledPeriodic()

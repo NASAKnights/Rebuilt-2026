@@ -83,10 +83,10 @@ private:
     frc::SendableChooser<std::string> m_chooser;
     frc::AnalogInput batteryShunt{0};
 
-    // ctre::phoenix6::CANBus NKCANBus{"NKCANivore"};
-    ctre::phoenix6::CANBus RioCANBus{"rio"};
-    // SwerveDrive m_swerveDrive{NKCANBus};
-    SwerveDrive m_swerveDrive{RioCANBus};
+    ctre::phoenix6::CANBus NKCANBus{"NKCANivore"};
+    // ctre::phoenix6::CANBus RioCANBus{"rio"};
+    SwerveDrive m_swerveDrive{NKCANBus};
+    // SwerveDrive m_swerveDrive{RioCANBus};
     // Wrist m_wrist;
     // Elevator m_elevator;
     // Climber m_climber;

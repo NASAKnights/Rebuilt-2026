@@ -51,7 +51,7 @@ namespace TurretConstants
     DISABLED
   };
 
-  const double kAngleP = 0.0;
+  const double kAngleP = 0.1;
   const double kAngleI = 0.00;
   const double kAngleD = 0.0; // 0.0001
   const double kIZone = 0.0;
@@ -90,7 +90,7 @@ namespace TurretConstants
   const double kYOffset = 0.0;
   const double kZOffset = 0.0;
   const units::degree_t kAngleOffset(0.0);
-  const units::volt_t kMaxVoltage = 2.0_V;
+  const units::volt_t kMaxVoltage = 4.0_V;
 
 } // namespace TurretConstants
 
@@ -116,6 +116,8 @@ public:
   {
     m_controller.Reset();
   }
+
+  void ChangeHoodAngle(double angle);
   // void get_pigeon();
   units::degree_t GetMeasurement();
   units::degrees_per_second_t GetVelocity();
@@ -153,8 +155,11 @@ private:
   frc::Pose2d CalculateTurretPose(const frc::Pose2d &robotPose);
   TurretConstants::TurretState m_TurretState;
   void printLog();
-  rev::spark::SparkMax m_motor;
+  rev::spark::SparkMax m_motor{TurretConstants::kAngleMotorId, rev::spark::SparkLowLevel::MotorType::kBrushless};
   rev::spark::SparkRelativeEncoder m_encoder;
+
+  frc::Servo m_hood{7};
+
   frc::ArmFeedforward m_feedforward;
   wpi::log::DoubleLogEntry m_AngleLog;
   wpi::log::DoubleLogEntry m_SetPointLog;

@@ -16,7 +16,7 @@ using degrees_per_second_squared_t =
 
 Turret::Turret() : m_controller(
                        TurretConstants::kAngleP, TurretConstants::kAngleI, TurretConstants::kAngleD),
-                    m_motor(TurretConstants::kAngleMotorId, rev::spark::SparkLowLevel::MotorType::kBrushless),
+                    // m_motor(TurretConstants::kAngleMotorId, rev::spark::SparkLowLevel::MotorType::kBrushless),
                     m_encoder(m_motor.GetEncoder()),
                     m_feedforward(TurretConstants::kFFks, TurretConstants::kFFkg, TurretConstants::kFFkV, TurretConstants::kFFkA),
 
@@ -31,8 +31,10 @@ Turret::Turret() : m_controller(
     config.encoder.PositionConversionFactor(TurretConstants::turretPositionConversionFactor);
     config.encoder.VelocityConversionFactor(TurretConstants::turretVelocityConversionFactor);
     config.SmartCurrentLimit(30, 0, 20000);
-    m_controller.SetIZone(TurretConstants::kIZone);
 
+    m_hood.SetBounds(units::microsecond_t{2000},units::microsecond_t{1550},units::microsecond_t{1500},units::microsecond_t{1450},units::microsecond_t{1000});
+
+    m_controller.SetIZone(TurretConstants::kIZone);
     m_controller.SetTolerance(TurretConstants::kTolerancePos.value(), TurretConstants::kToleranceVel.value());
     // Start m_Turret in neutral position
     m_TurretState = TurretConstants::TRACKING;
@@ -58,6 +60,7 @@ Turret::Turret() : m_controller(
 
     m_turretObject = m_turretField.GetObject("Turret");
     frc::SmartDashboard::PutData("Turret Field", &m_turretField);
+    m_motor.Configure(config, rev::spark::SparkMax::ResetMode::kResetSafeParameters, rev::spark::SparkMax::PersistMode::kPersistParameters);
     m_encoder.SetPosition(0.0);
     SetAngle(0.0_deg);
 
@@ -104,7 +107,7 @@ std::pair<units::degree_t, units::degrees_per_second_t> Turret::findTrackingAngl
 
     // Check for stale data (timestamp hasn't changed)
     bool poseIsStale = false;
-    if (m_lastPoseUpdateTime != 0 && poseTimestamp == m_lastPoseUpdateTime)
+    if (m_lastPoseUpdateTime != 0 && poseTimestamp - m_lastPoseUpdateTime > 1e5)
     {
         // Timestamp hasn't changed - pose is stale
         poseIsStale = true;
@@ -270,7 +273,7 @@ void Turret::SetAngle(units::degree_t TurretAngleGoal, units::degrees_per_second
         if ((TurretAngleGoal <= TurretConstants::kmaxAngle) &&
             (TurretAngleGoal >= TurretConstants::kminAngle))
         {
-            units::degrees_per_second_t robotVel = units::degrees_per_second_t{frc::SmartDashboard::GetNumber("Angular velocity", 0.0)};
+            // units::degrees_per_second_t robotVel = units::degrees_per_second_t{frc::SmartDashboard::GetNumber("Angular velocity", 0.0)};
             auto velocity = GetVelocity();
             m_goal = units::angle::degree_t(TurretAngleGoal);
             if (abs(velocity.value()) < (1_deg_per_s).value())
@@ -279,6 +282,7 @@ void Turret::SetAngle(units::degree_t TurretAngleGoal, units::degrees_per_second
             }
             m_velocityGoal = velocityGoal;
             m_controller.SetSetpoint(m_goal.value());
+            // m_feedforward.
         }
     }
     frc::SmartDashboard::PutNumber("/Turret/m_goal", double(m_goal));
@@ -287,6 +291,11 @@ void Turret::SetAngle(units::degree_t TurretAngleGoal, units::degrees_per_second
 units::degrees_per_second_t Turret::GetVelocity()
 {
     return units::degrees_per_second_t{m_encoder.GetVelocity()};
+}
+
+void Turret::ChangeHoodAngle(double HoodAngle)
+{
+    m_hood.Set(HoodAngle);
 }
 
 void Turret::Periodic()
@@ -323,14 +332,12 @@ void Turret::Periodic()
         fb = m_controller.Calculate(GetMeasurement().value());
         ff = m_feedforward.Calculate(angle, velocity);
         v = units::volt_t{fb} + ff;
-        if(v > units::volt_t{2.0}){
-            v = 2.0_V;
-        }
-        else if(v < -2.0_V){
-            v = -2.0_V;
-        }
+
         // units::degrees_per_second_t robotVel = units::degrees_per_second_t{frc::SmartDashboard::GetNumber("Angular velocity", 0.0)};
         // auto turretVel = GetVelocity();
+        // frc::SmartDashboard::PutNumber("/Turret/GM", double(GetMeasurement()));
+        // frc::SmartDashboard::PutNumber("/Turret/FB", double(fb));
+        frc::SmartDashboard::PutNumber("/Turret/ff_vel  ", double(velocity));
 
         frc::SmartDashboard::PutNumber("/Turret/Voltage", double(v));
         break;
