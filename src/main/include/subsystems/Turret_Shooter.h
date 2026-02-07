@@ -7,6 +7,10 @@
 #include <frc2/command/SubsystemBase.h>
 #include <rev/SparkFlex.h>
 #include <rev/SparkMax.h>
+// #include <ctre/phoenix6/TalonFX.hpp>
+#include <frc/motorcontrol/PWMMotorController.h>
+#include <ctre/phoenix6/TalonFXS.hpp>
+#include <ctre/phoenix6/controls/Follower.hpp>
 #include <units/angle.h>
 #include <units/velocity.h>
 #include <units/acceleration.h>
@@ -21,48 +25,47 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 
+
+namespace Turret_ShooterConstants {
+
+  static const int kMotorIdLeft = 1;
+  static const int kMotorIdRight = 3;
+}
+
 class Turret_Shooter : public frc2::SubsystemBase
 {
 public:
   Turret_Shooter();
 
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
   void Periodic() override;
 
   void StopMotors();
-  void SetSpeed();
-  void NewSetSpeed();
-  double max_speed = 5000; // need to change to actual value we want
-  double min_speed = -5000;
+  void SetSpeed(units::meters_per_second_t speed); // speed of the ball leaving the shooter
 
 private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
+  ctre::phoenix6::hardware::TalonFXS m_leftMotor{Turret_ShooterConstants::kMotorIdLeft};
+  ctre::phoenix6::hardware::TalonFXS m_rightMotor{Turret_ShooterConstants::kMotorIdRight};
 
-  rev::spark::SparkFlex m_mainShooterMotor{13, rev::spark::SparkLowLevel::MotorType::kBrushless};
-  rev::spark::SparkFlex m_followerShooterMotor{14, rev::spark::SparkLowLevel::MotorType::kBrushless};
-  rev::spark::SparkMax m_backMotor{15, rev::spark::SparkLowLevel::MotorType::kBrushless};
+  static constexpr units::inch_t kFlywheelDiameter = units::inch_t{2.625};
+  static constexpr int kGearRatio = 2;
+  static constexpr units::inch_t kBallDiameter = units::inch_t{5.91};
 
-  rev::spark::SparkBaseConfig followerShooterMotorConfig;
-  rev::spark::SparkBaseConfig mainShooterMotorConfig;
-  rev::spark::SparkBaseConfig backShooterMotorConfig;
-
-  rev::spark::SparkClosedLoopController mainMotorController = m_mainShooterMotor.GetClosedLoopController();
-  rev::spark::SparkClosedLoopController backMotorController = m_backMotor.GetClosedLoopController();
-
-  // static constexpr auto kFFks = 0.05_V;                                                // Volts static (motor)
-  // static constexpr auto kFFkV = 0.25_V / 1.0_rpm;                                      // volts*s/meters //1.01 // 2.23
-  // static constexpr auto kFFkA = 0.38_V / units::revolutions_per_minute_squared_t{1.0}; // volts*s^2/meters //0.1
-  // frc::SimpleMotorFeedforward<units::turn_t> m_feedforward;
-
-  double shooterSpeed = 0.0;
-  double newShooterSpeed = 0.0;
-
-  double kP = 0.005;
+  double kP = 0.003;
   double kI = 0.0;
   double kD = 0.0;
-  double kMinOutput = -1.0;
-  double kMaxOutput = 1.0;
+  double kS = 0.6;
+  double kA = 0.0;
+  double kV = 0.04;
+
+  // determines how much faster the flywheel needs to spin
+  // so that the exit velocity meets the specified speed 
+  double kFlyWheelVelocityGain = 1.0;
+
+  const int kMotorIdLeft = 1;
+  const int kMotorIdRight = 3;
+
+  bool kEnableCurrentLimit = true;
+  units::ampere_t kPeakCurrentLimit = units::ampere_t{53};
+  units::ampere_t kContinousCurrentLimit = units::ampere_t{40};
+  units::second_t kPeakCurrentDuration = units::second_t{0.1};
 };
