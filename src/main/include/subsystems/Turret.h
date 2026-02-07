@@ -51,20 +51,20 @@ namespace TurretConstants
     DISABLED
   };
 
-  const double kAngleP = 0.2;
-  const double kAngleI = 0.01;
+  const double kAngleP = 0.0;
+  const double kAngleI = 0.00;
   const double kAngleD = 0.0; // 0.0001
-  const double kIZone = 1.0;
+  const double kIZone = 0.0;
   const auto kTurretVelLimit = units::degrees_per_second_t(500.0);
   const auto kTurretAccelLimit = units::angular_acceleration::degrees_per_second_squared_t(800); // Mech limit 27 rad/s^2(1500 degree_second_squared)
   const units::degree_t kTolerancePos = 1_deg;
   const units::degrees_per_second_t kToleranceVel = 0.5_deg_per_s;
   const int kAngleMotorId = 50;
 
-  const auto kFFks = units::volt_t(0.23);                                // Volts static (motor)
+  const auto kFFks = units::volt_t(0.2);                                // Volts static (motor)
   const auto kFFkg = units::volt_t(0.0);                                 // Volts
-  const auto kFFkV = units::unit_t<frc::ArmFeedforward::kv_unit>(0.3);   // volts*s/rad
-  const auto kFFkA = units::unit_t<frc::ArmFeedforward::ka_unit>(0.001); // volts*s^2/rad
+  const auto kFFkV = units::unit_t<frc::ArmFeedforward::kv_unit>(0.5);   // volts*s/rad
+  const auto kFFkA = units::unit_t<frc::ArmFeedforward::ka_unit>(0.000); // volts*s^2/rad
 
   const bool kTurretEnableCurrentLimit = true;
   const int kTurretContinuousCurrentLimit = 35;
@@ -82,6 +82,10 @@ namespace TurretConstants
   const units::angle::radian_t kmaxAngle = 45_deg;
   const bool kGravity = false;
   const units::angle::radian_t kTurretStartAngle = units::angle::radian_t(0.0);
+
+  const double turretPositionConversionFactor  = 360.0 / TurretConstants::kGearRatio;
+  const double turretVelocityConversionFactor = 360.0 / TurretConstants::kGearRatio / 60.0;
+
   const double kXOffset = 0.0;
   const double kYOffset = 0.0;
   const double kZOffset = 0.0;
@@ -149,7 +153,8 @@ private:
   frc::Pose2d CalculateTurretPose(const frc::Pose2d &robotPose);
   TurretConstants::TurretState m_TurretState;
   void printLog();
-  ctre::phoenix6::hardware::TalonFX m_motor;
+  rev::spark::SparkMax m_motor;
+  rev::spark::SparkRelativeEncoder m_encoder;
   frc::ArmFeedforward m_feedforward;
   wpi::log::DoubleLogEntry m_AngleLog;
   wpi::log::DoubleLogEntry m_SetPointLog;

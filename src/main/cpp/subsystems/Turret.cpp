@@ -16,18 +16,21 @@ using degrees_per_second_squared_t =
 
 Turret::Turret() : m_controller(
                        TurretConstants::kAngleP, TurretConstants::kAngleI, TurretConstants::kAngleD),
-
-                   m_motor(TurretConstants::kAngleMotorId), m_feedforward(TurretConstants::kFFks, TurretConstants::kFFkg, TurretConstants::kFFkV,
-                                                                          TurretConstants::kFFkA),
+                    m_motor(TurretConstants::kAngleMotorId, rev::spark::SparkLowLevel::MotorType::kBrushless),
+                    m_encoder(m_motor.GetEncoder()),
+                    m_feedforward(TurretConstants::kFFks, TurretConstants::kFFkg, TurretConstants::kFFkV, TurretConstants::kFFkA),
 
                    m_TurretSim(TurretConstants::kSimMotor, TurretConstants::kGearRatio, TurretConstants::kmoi,
                                TurretConstants::kTurretRadius, TurretConstants::kminAngle, TurretConstants::kmaxAngle,
                                TurretConstants::kGravity, TurretConstants::kTurretStartAngle, TurretConstants::kSimNoise)
 {
     // m_motor.SetInverted(true);
-    ctre::phoenix6::configs::TalonFXConfiguration config;
-    config.MotorOutput.Inverted = ctre::phoenix6::signals::InvertedValue::Clockwise_Positive;
-    m_motor.GetConfigurator().Apply(config);
+    m_motor.SetInverted(true);
+    rev::spark::SparkBaseConfig config;
+    config.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kBrake);
+    config.encoder.PositionConversionFactor(TurretConstants::turretPositionConversionFactor);
+    config.encoder.VelocityConversionFactor(TurretConstants::turretVelocityConversionFactor);
+    config.SmartCurrentLimit(30, 0, 20000);
     m_controller.SetIZone(TurretConstants::kIZone);
 
     m_controller.SetTolerance(TurretConstants::kTolerancePos.value(), TurretConstants::kToleranceVel.value());
@@ -55,7 +58,7 @@ Turret::Turret() : m_controller(
 
     m_turretObject = m_turretField.GetObject("Turret");
     frc::SmartDashboard::PutData("Turret Field", &m_turretField);
-    m_motor.SetPosition(0.0_rad);
+    m_encoder.SetPosition(0.0);
     SetAngle(0.0_deg);
 
     // if constexpr(frc::RobotBase::IsSimulation())
@@ -79,7 +82,7 @@ units::degree_t Turret::GetMeasurement()
         return m_TurretSim.GetAngle();
     }
 
-    return units::turn_t{(m_motor.GetPosition().GetValue() / TurretConstants::kGearRatio)};
+    return units::degree_t{(m_encoder.GetPosition())};
 }
 
 std::pair<units::degree_t, units::degrees_per_second_t> Turret::findTrackingAngle()
@@ -283,7 +286,7 @@ void Turret::SetAngle(units::degree_t TurretAngleGoal, units::degrees_per_second
 
 units::degrees_per_second_t Turret::GetVelocity()
 {
-    return (m_motor.GetVelocity().GetValue() / TurretConstants::kGearRatio);
+    return units::degrees_per_second_t{m_encoder.GetVelocity()};
 }
 
 void Turret::Periodic()

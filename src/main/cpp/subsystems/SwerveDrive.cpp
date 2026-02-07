@@ -26,8 +26,9 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
                                                                                                                                             frc::Rotation2d(0_deg), // Initial pose rotation, will be updated
                                                                                                                                             {modules[0].GetPosition(), modules[1].GetPosition(), modules[2].GetPosition(),
                                                                                                                                              modules[3].GetPosition()},
-                                                                                                                                            frc::Pose2d()}
-    //   m_pigeonSim{m_pigeon}
+                                                                                                                                            frc::Pose2d()},
+                                                                                                                                            m_pigeon{2, canBus},
+      m_pigeonSim{m_pigeon}
 {
 
     // Add a function that loads the Robot Preferences, including
@@ -67,8 +68,8 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
     // degrees_t x_deg = degrees_t{x} (Psuedo code)
 
     // navx.Calibrate();
-    navx.Reset();
-    // m_pigeon.SetYaw(0_deg);
+    // navx.Reset();
+    m_pigeon.SetYaw(0_deg);
     
     // Reseed the pose estimator with the correct initial rotation
     m_poseEstimator.ResetPosition(GetHeading(), GetModulePositions(), frc::Pose2d());
@@ -297,7 +298,7 @@ frc::Rotation2d SwerveDrive::GetHeading()
     }
     
     if (m_usingPigeon) {
-        // return frc::Rotation2d(m_pigeon.GetYaw().GetValue());
+        return frc::Rotation2d(m_pigeon.GetYaw().GetValue());
         // Note: Pigeon2 is CCW+, so this matches standard NWU.
     } else {
         // NavX is CW+ by default, need to negate for NWU?
@@ -306,7 +307,7 @@ frc::Rotation2d SwerveDrive::GetHeading()
         // Usually we use -GetAngle() or similar.
         // The previous code had `navx.GetRotation2d()`. Let's stick with that but verifying is good.
         // Assuming NavX GetRotation2d() aligns with WPILib (CCW+).
-        return navx.GetRotation2d();
+        // return navx.GetRotation2d();
     }
 }
 
@@ -314,8 +315,8 @@ void SwerveDrive::ResetHeading()
 {
     if (enable == true)
     {
-        navx.Reset();
-        // m_pigeon.SetYaw(0_deg);
+        // navx.Reset();
+        m_pigeon.SetYaw(0_deg);
         m_simAngle = frc::Rotation2d();
     }
 }
