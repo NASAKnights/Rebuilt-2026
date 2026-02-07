@@ -60,6 +60,7 @@ private:
   rev::spark::SparkMax m_indexerMotor{16, rev::spark::SparkLowLevel::MotorType::kBrushless};
 
   frc::Servo VariableHoodServo{7};
+  frc::Servo hoodServo{8};
   
   rev::spark::SparkBaseConfig followerShooterMotorConfig;
   rev::spark::SparkBaseConfig mainShooterMotorConfig;

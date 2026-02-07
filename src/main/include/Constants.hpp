@@ -21,6 +21,10 @@
 
 #include "SDSModuleType.hpp"
 
+#define DEBUG 1
+// debug == 0 -> compile with network table values
+// debug == 1 -> compile without network table values
+
 namespace ElectricalConstants
 {
     const int kFrontLeftDriveMotorID = 10;

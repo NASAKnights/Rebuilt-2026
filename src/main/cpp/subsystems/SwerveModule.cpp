@@ -111,18 +111,20 @@ SwerveModule::SwerveModule(int driveMotorID, int steerMotorID,
 // This method will be called once per scheduler run
 void SwerveModule::Periodic()
 {
-  frc::SmartDashboard::PutNumber("Module " + std::to_string(m_id) + "/" +
-                                     " Reported Angle",
-                                 GetRotation().Degrees().value());
-  frc::SmartDashboard::PutNumber("Module " + std::to_string(m_id) + "/" +
-                                     " CANCoder Angle",
-                                 GetAbsoluteRotation().Degrees().value());
-  frc::SmartDashboard::PutNumber(
-      "Module " + std::to_string(m_id) + "/" + " Velocity",
-      (m_driveMotor.GetVelocity()).GetValue().value());
-  frc::SmartDashboard::PutNumber(
-      "Module " + std::to_string(m_id) + "/" + " Rotations",
-      (m_driveMotor.GetPosition()).GetValue().value());
+  #if DEBUG == 0
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_id) + "/" +
+                                        " Reported Angle",
+                                    GetRotation().Degrees().value());
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_id) + "/" +
+                                        " CANCoder Angle",
+                                    GetAbsoluteRotation().Degrees().value());
+    frc::SmartDashboard::PutNumber(
+        "Module " + std::to_string(m_id) + "/" + " Velocity",
+        (m_driveMotor.GetVelocity()).GetValue().value());
+    frc::SmartDashboard::PutNumber(
+        "Module " + std::to_string(m_id) + "/" + " Rotations",
+        (m_driveMotor.GetPosition()).GetValue().value());
+  #endif 
 }
 
 void SwerveModule::SimulationPeriodic()

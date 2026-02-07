@@ -17,7 +17,8 @@ Turret_Shooter::Turret_Shooter()
 
     mainShooterMotorConfig.Inverted(true);
 
-        VariableHoodServo.SetBounds(units::microsecond_t{2000},units::microsecond_t{1550},units::microsecond_t{1500},units::microsecond_t{1450},units::microsecond_t{1000});
+    VariableHoodServo.SetBounds(units::microsecond_t{2000},units::microsecond_t{1550},units::microsecond_t{1500},units::microsecond_t{1450},units::microsecond_t{1000});
+    hoodServo.SetBounds(units::microsecond_t{2000},units::microsecond_t{1550},units::microsecond_t{1500},units::microsecond_t{1450},units::microsecond_t{1000});
 
     // mainShooterMotorConfig.closedLoop
     //     .P(kP)
@@ -123,6 +124,7 @@ void Turret_Shooter::BasicSlowShoot()
 void Turret_Shooter::ChangeHoodAngle(double HoodAngle)
 {
     VariableHoodServo.Set(HoodAngle);
+    hoodServo.Set(HoodAngle);
 }
 
 // This method will be called once per scheduler run
