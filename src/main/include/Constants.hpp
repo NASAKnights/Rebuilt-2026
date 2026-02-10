@@ -32,7 +32,7 @@ namespace FuelConstants {
     static constexpr double INTAKING_FEEDER_VOLTAGE = 12.0;
     static constexpr double INTAKING_INTAKE_VOLTAGE = 10.0;
     static constexpr double LAUNCHING_FEEDER_VOLTAGE = -11.0;
-    static constexpr double LAUNCHING_LAUNCHER_VOLTAGE = 10.6;
+    static constexpr double LAUNCHING_LAUNCHER_VOLTAGE = 11.6;
     static constexpr double SPIN_UP_FEEDER_VOLTAGE = -6.0;
     static constexpr double SPIN_UP_SECONDS = 1.0;
 }
