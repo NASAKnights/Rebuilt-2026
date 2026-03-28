@@ -1035,7 +1035,7 @@ void Turret::CalculateTargetingSolution(const frc::Pose2d &robotPose, units::sec
     }
 
     // Compute desired yaw in field frame
-    sol_lead_angle = std::clamp(sol_lead_angle,-0.35_rad, 0.35_rad);
+    sol_lead_angle = std::clamp(sol_lead_angle, -TurretConstants::kLeadAngleClamp, TurretConstants::kLeadAngleClamp);
     units::radian_t turret_yaw = angleToGoal + sol_lead_angle;
     // units::radian_t turret_yaw = angleToGoal;
 

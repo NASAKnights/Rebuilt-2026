@@ -45,7 +45,6 @@ namespace Turret_ShooterConstants {
   static const int kIndexerMotorId = 6;
 
   static const double spindexerSpeed = 0.2;
-  static const double indexerSpeed = -0.95;
   const double kPercentBoost = 0.0;
 
   const double kMinLaunchRPS = 2000;
@@ -56,15 +55,15 @@ namespace Turret_ShooterConstants {
   static constexpr double kSpindexerS = 0.1;
   static constexpr double kSpindexerV = 1.3;
 
-  static constexpr double kIndexerP = 0.002;
+  static constexpr double kIndexerP = 0.0001;
   static constexpr double kIndexerI = 0.0;
   static constexpr double kIndexerD = 0.0;
-  static constexpr double kIndexerkV = 0.003;
+  static constexpr double kIndexerkV = 0.00015;
 
   // Spindexer operates on a 5:1 gearbox. 
   // Native RPS is measured at the motor.
-  static constexpr units::turns_per_second_t kSpindexerShootVelocity = -20_tps;
-  static constexpr double kIndexerShootVelocityRPM = -2000;
+  static constexpr units::turns_per_second_t kSpindexerShootVelocity = -25_tps;
+  static constexpr double kIndexerShootVelocityRPM = -4000;
 }
 
 class Turret_Shooter : public frc2::SubsystemBase
@@ -139,9 +138,9 @@ private:
       {2.5, 45.5},
       {3.0, 50.},
       {3.5, 55.}, //8 deg extra
-      {4.0, 64.75},
-      {4.5, 65.}, //10 deg extra
-      {5.0, 70.},
+      {4.0, 65.},
+      {4.5, 67.5}, //10 deg extra
+      {5.0, 71},
       {5.5, 75.},
       {6.0, 80.},
       {6.5, 85.},

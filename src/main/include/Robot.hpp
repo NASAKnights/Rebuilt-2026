@@ -43,11 +43,12 @@
 #include "subsystems/LEDController.h"
 
 #include "commands/AutoWheelOffsets.h"
-#include "commands/Climb.h"
+// #include "commands/Climb.h"
 #include "commands/FlattenMoonKnight.h"
 #include "commands/HalfRaiseIntake.h"
 #include "commands/Intake.h"
 #include "commands/Shoot.h"
+#include "commands/BetterHalfRaise.h"
 
 #include <cmath>
 

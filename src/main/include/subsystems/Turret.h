@@ -100,6 +100,9 @@ namespace TurretConstants
   const bool kGravity = false;
   const units::angle::radian_t kTurretStartAngle = units::angle::radian_t(0.0);
 
+
+  const units::radian_t kLeadAngleClamp = 0.698_rad;
+
   //HOOD VALUES
   const frc::DCMotor kHoodSimMotor = frc::DCMotor::KrakenX60(1);
   const double kHoodGearRatio = 1; // gear ratio for motor to arm
@@ -347,7 +350,7 @@ private:
       {3.0, 57.5},
       {3.5, 55}, //8 deg extra
       {4.0, 51.75},
-      {4.5, 49.5}, //10 deg extra
+      {4.5, 50.5}, //10 deg extra
       {5.0, 47.},
       {5.5, 43.},
       {6.0, 40.},

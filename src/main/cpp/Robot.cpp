@@ -244,6 +244,7 @@ void Robot::CreateRobot()
     pathplanner::NamedCommands::registerCommand("HalfRaiseIntake", HalfRaiseIntake(&m_intake, &m_wrist).ToPtr());
     pathplanner::NamedCommands::registerCommand("Shoot", Shoot(&m_turret, true).ToPtr());
     pathplanner::NamedCommands::registerCommand("NoShoot", Shoot(&m_turret, false).ToPtr());
+    pathplanner::NamedCommands::registerCommand("BetterHalfRaise", BetterHalfRaise(&m_intake, &m_wrist).ToPtr());
     // pathplanner::NamedCommands::registerCommand("ExtendClimb", Climb(&m_climber, true).ToPtr());
     // pathplanner::NamedCommands::registerCommand("RetractClimb", Climb(&m_climber, false).ToPtr());
 
@@ -330,15 +331,15 @@ void Robot::BindCommands()
     //                                 return; })));
                                 
     
-    frc2::JoystickButton(&m_operatorController, 5)
-    .OnTrue(frc2::CommandPtr(
-                frc2::InstantCommand([this]
-                                    {m_swerveDrive.SetSlow();
-                                        return; })))
-            .OnFalse(frc2::CommandPtr(
-                frc2::InstantCommand([this]
-                                    { m_swerveDrive.SetFast();
-                                    return; })));
+    // frc2::JoystickButton(&m_operatorController, 5)
+    // .OnTrue(frc2::CommandPtr(
+    //             frc2::InstantCommand([this]
+    //                                 {m_swerveDrive.SetSlow();
+    //                                     return; })))
+    //         .OnFalse(frc2::CommandPtr(
+    //             frc2::InstantCommand([this]
+    //                                 { m_swerveDrive.SetFast();
+    //                                 return; })));
     
     
 
@@ -367,7 +368,7 @@ void Robot::BindCommands()
                                         return; })))
                 .OnFalse(frc2::CommandPtr(
                 frc2::InstantCommand([this]
-                                        { m_wrist.SetAngle(3);
+                                        { m_wrist.SetAngle(4);
                                         m_intake.StopIntake(); 
                                         return;})));
 
@@ -388,7 +389,7 @@ void Robot::BindCommands()
         frc2::JoystickButton(&m_operatorController, 6)
                 .OnTrue(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                                        { m_wrist.SetAngle(3.);
+                                        { m_wrist.SetAngle(4.);
                                         m_intake.Intake();
                                         return; })))
                 .OnFalse(frc2::CommandPtr(
@@ -412,7 +413,7 @@ void Robot::BindCommands()
         frc2::JoystickButton(&m_driverController, 6)
                 .OnTrue(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                                        { m_wrist.SetAngle(3.);
+                                        { m_wrist.SetAngle(4.);
                                         m_intake.Intake();
                                         return; })))
                 .OnFalse(frc2::CommandPtr(
