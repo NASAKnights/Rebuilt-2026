@@ -439,7 +439,7 @@ double Turret::GetRobotVelocityShooterSpeedCorrection(double tn){
         
         tn = tn - (E/dE);
 
-        if (E == 0.0){
+        if (E < 0.001 && E > -0.001){
             break;
         }
     }
