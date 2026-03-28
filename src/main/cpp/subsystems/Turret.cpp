@@ -19,7 +19,52 @@ units::turns_per_second_t GetShooterSpeedCorrection(units::degree_t turretAngle,
     // +peak at 90 deg (topspin), -peak at 270 deg (backspin).
     return amplitude * std::sin(units::radian_t{turretAngle}.value());
 }
+
+units::degree_t GetRobotVelocityTurretAngleCorrection(frc::Pose2d robotPose, units::degree_t KVTurretAngleCompensation, units::meter_t target_distance){
+
+        // units::radian_t robotAngle = robotPose.Rotation().Radians();
+        // // Get the robot's linear and angular velocity from the swervedrive.
+        // // The linear velocities are oriented relative to the robot, not the field.
+        // auto robotVx = frc::SmartDashboard::GetNumber("drive/vx", 0.0);
+        // auto robotVy = frc::SmartDashboard::GetNumber("drive/vy", 0.0);
+        // auto robotOmega = frc::SmartDashboard::GetNumber("drive/omega", 0.0);
+        // // auto robotVx = units::meters_per_second_t{0.0};
+        // // auto robotVy = units::meters_per_second_t{0.0};
+        // // auto robotOmega = 0.0_rad_per_s;
+
+        // // Reorient robotVx, robotVy to the world reference frame (field)
+        // double robotWorldVx = robotVx * std::cos(robotAngle.value()) - 
+        //                                         robotVy * std::sin(robotAngle.value());
+        // double robotWorldVy = robotVx * std::sin(robotAngle.value()) + 
+        //                                         robotVy * std::cos(robotAngle.value());
+        
+        // std::vector<std::vector<double>> robotWorldTwist = {{robotWorldVx},
+        //                                                     {robotWorldVy},
+        //                                                     {0.0},
+        //                                                     {0.0},
+        //                                                     {0.0},
+        //                                                     {robotOmega}};
+
+        // // Goal in the world frame
+        // Eigen::Matrix3d goalPose = frc::Transform3d(2_m, 2_m, 0.0_m, frc::Rotation3d()).ToMatrix();
+
+
+        // Eigen::Matrix<double, 6,1> RobotGoalTwist = goalPose.adjoint() * Eigen::Matrix<double,6,1>{robotWorldTwist};
+        
+        // //Convert twist to polar coordinates so velocity maintains locked on the hub
+        // //Somehow get turret angle compensation
+        
+        // RobotGoalTwist
+
+
+
+        return KVTurretAngleCompensation;
+
+
 }
+
+}
+
 
 // using State = frc::TrapezoidProfile<units::degrees>::State;
 using degrees_per_second_squared_t =
@@ -305,6 +350,102 @@ void Turret::SetHood(double extension){
     m_hood2.Set(extension);
 }
 
+double Turret::getTOF(double distance){
+    double TOF = 0; 
+    double distVal = distance;
+    if (!kShotTOFMap.empty()){
+        auto itHigh = kShotTOFMap.lower_bound(distVal);
+
+        if (itHigh == kShotTOFMap.begin()) {
+            // Distance is smaller than our first entry
+            TOF = itHigh->second;
+        } else if (itHigh == kShotTOFMap.end()) {
+            // Distance is larger than our last entry
+            TOF = std::prev(itHigh)->second;
+        } else {
+            // Interpolate between prev and itHigh
+            auto itLow = std::prev(itHigh);
+            double d1 = itLow->first;
+            double g1 = itLow->second;
+            double d2 = itHigh->first;
+            double g2 = itHigh->second;
+
+            double t = (distVal - d1) / (d2 - d1);
+            TOF = g1 + t * (g2 - g1);
+        }
+    }
+
+    return TOF;
+}
+
+units::meter_t Turret::getDistanceFromTOF(double TOF){
+    double distance = 0; 
+    if (!kDistanceFromTOFMap.empty()){
+        auto itHigh = kDistanceFromTOFMap.lower_bound(TOF);
+
+        if (itHigh == kDistanceFromTOFMap.begin()) {
+            // Distance is smaller than our first entry
+            distance = itHigh->second;
+        } else if (itHigh == kDistanceFromTOFMap.end()) {
+            // Distance is larger than our last entry
+            distance = std::prev(itHigh)->second;
+        } else {
+            // Interpolate between prev and itHigh
+            auto itLow = std::prev(itHigh);
+            double d1 = itLow->first;
+            double g1 = itLow->second;
+            double d2 = itHigh->first;
+            double g2 = itHigh->second;
+
+            double t = (TOF - d1) / (d2 - d1);
+            distance = g1 + t * (g2 - g1);
+        }
+    }
+
+    return units::meter_t{distance};
+}
+
+
+
+double Turret::GetRobotVelocityShooterSpeedCorrection(double tn){
+    for(int i = 0; i < 5; i++){
+        auto poseResult = baseLinkSubscriber.GetAtomic();
+        std::vector<double> baseLinkPose = poseResult.value;
+        auto robotPose = DoubleArrayToPose2d(baseLinkPose).value();
+        units::radian_t robotAngle = robotPose.Rotation().Radians();
+        // Get the robot's linear and angular velocity from the swervedrive.
+        // The linear velocities are oriented relative to the robot, not the field.
+        auto robotVx = frc::SmartDashboard::GetNumber("drive/vx", 0.0);
+        auto robotVy = frc::SmartDashboard::GetNumber("drive/vy", 0.0);
+        // auto robotVx = units::meters_per_second_t{0.0};
+        // auto robotVy = units::meters_per_second_t{0.0};
+
+        // Reorient robotVx, robotVy to the world reference frame (field)
+        double robotWorldVx = robotVx * std::cos(robotAngle.value()) - 
+                                                robotVy * std::sin(robotAngle.value());
+        double robotWorldVy = robotVx * std::sin(robotAngle.value()) + 
+                                                robotVy * std::cos(robotAngle.value());
+        
+        frc::Transform3d goalPose = frc::Transform3d(2_m, 2_m, 0.0_m, frc::Rotation3d());
+        
+
+        double dx = robotPose.X().value() - goalPose.X().value();
+        double dy = robotPose.Y().value() - goalPose.Y().value();
+        double D = frc::SmartDashboard::GetNumber("/Turret/Pose/Target Distance", 0.0);
+        double vp = 0.0; //TODO, What is the projectiles Horizontal Velocity.
+
+        double E = tn - getTOF(D);
+        double dE = 1 + ((dx*robotVx + dy*robotVx)/(vp*D));
+        
+        tn = tn - (E/dE);
+
+        if (E == 0.0){
+            break;
+        }
+    }
+        return tn;
+}
+
 void Turret::ChangeHoodAngle(units::meter_t distance)
 {
     double hoodAngle = 0; // no offset
@@ -362,6 +503,7 @@ double Turret::GetHoodAngle(){
     }
     return 0.0;
 }
+
 void Turret::ChangeHoodAngle(double ballLaunchAngleDegrees)
 {
     
@@ -601,7 +743,10 @@ void Turret::Periodic()
                 }
             }
             else{
-                ChangeHoodAngle(m_BallisticDistance);
+                double initialTOF = getTOF(m_BallisticDistance.value());
+                double TOF = GetRobotVelocityShooterSpeedCorrection(initialTOF);
+                auto m_BallisticDistanceAfterComp = getDistanceFromTOF(TOF);
+                ChangeHoodAngle(m_BallisticDistanceAfterComp);
             }
         }
         else {
@@ -636,7 +781,10 @@ void Turret::Periodic()
                 // commandedMotorSpeed = units::turns_per_second_t{manualShootingPreset1()[0]};
             }
             else{
-                commandedMotorSpeed = m_turret_shooter.GetMotorSpeedFromMap(m_BallisticDistance);
+                double initialTOF = getTOF(m_BallisticDistance.value());
+                double TOF = GetRobotVelocityShooterSpeedCorrection(initialTOF);
+                auto m_BallisticDistance2 = getDistanceFromTOF(TOF);
+                commandedMotorSpeed = m_turret_shooter.GetMotorSpeedFromMap(m_BallisticDistance2);
 
             }
             const units::turns_per_second_t speedCompAmp{frc::SmartDashboard::GetNumber("/Turret/Comp/ShooterSpeedAmpRPS", 0.0)};
@@ -772,6 +920,7 @@ void Turret::PresetShooting(bool temp, std::string preset){
     }
     presetType = preset; // Sets which preset we use
 }
+
 void Turret::SetCurrentMapState(std::map<double, double> inputCurrentState) {
     kHoodOffsetMap = inputCurrentState;
 }

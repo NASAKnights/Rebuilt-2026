@@ -71,8 +71,8 @@ void Robot::RobotPeriodic()
     //                                     0.45_m,
     //                                     frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad));
 
-    frc::Pose3d HoodPose3D = frc::Pose3d(ShooterPose3D.X() + units::meter_t{TurretConstants::kHoodXOffset *(std::cos(double(m_turret.GetMeasurement() - 90_deg)))},
-                                        ShooterPose3D.Y() + units::meter_t{TurretConstants::kHoodYOffset *(std::sin(double(m_turret.GetMeasurement() - 90_deg)))},
+    frc::Pose3d HoodPose3D = frc::Pose3d(units::meter_t{ 1 * TurretConstants::kHoodXOffset *(std::cos(double(m_turret.GetMeasurement()) - 90))},
+                                        units::meter_t{ 1 * TurretConstants::kHoodXOffset *(std::sin(double(m_turret.GetMeasurement()) - 90))},
                                         0.545_m,
                                         frc::Rotation3d(0.0_rad, units::radian_t{((90 - m_turret.GetHoodAngle())*3.14159)/180} , units::radian_t{m_turret.GetMeasurement()}));
 
