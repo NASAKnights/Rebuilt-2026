@@ -401,24 +401,35 @@ units::meter_t Turret::getDistanceFromTOF(double TOF){
             distance = g1 + t * (g2 - g1);
         }
     }
-
+    
     return units::meter_t{distance};
 }
 
 
 
 double Turret::GetRobotVelocityShooterSpeedCorrection(double tn){
+    double distanceToTarget = frc::SmartDashboard::GetNumber("/Turret/Pose/Target Distance", 0.0);
+    std::vector<double> defaultGoal = {4.0, 4.0, 0.0};
+    std::vector<double> goalArray = goalSubscriber.Get(defaultGoal);
+    if (goalArray.size() >= 3) {
+        goal = frc::Transform3d(
+            units::meter_t{goalArray[0]},
+            units::meter_t{goalArray[1]},
+            units::meter_t{goalArray[2]},
+            frc::Rotation3d()
+        );
+    } // Change to grab from smartdashboard
+    
     for(int i = 0; i < 5; i++){
         auto poseResult = baseLinkSubscriber.GetAtomic();
         std::vector<double> baseLinkPose = poseResult.value;
         auto robotPose = DoubleArrayToPose2d(baseLinkPose).value();
         units::radian_t robotAngle = robotPose.Rotation().Radians();
+
         // Get the robot's linear and angular velocity from the swervedrive.
         // The linear velocities are oriented relative to the robot, not the field.
         auto robotVx = frc::SmartDashboard::GetNumber("drive/vx", 0.0);
         auto robotVy = frc::SmartDashboard::GetNumber("drive/vy", 0.0);
-        // auto robotVx = units::meters_per_second_t{0.0};
-        // auto robotVy = units::meters_per_second_t{0.0};
 
         // Reorient robotVx, robotVy to the world reference frame (field)
         double robotWorldVx = robotVx * std::cos(robotAngle.value()) - 
@@ -426,16 +437,15 @@ double Turret::GetRobotVelocityShooterSpeedCorrection(double tn){
         double robotWorldVy = robotVx * std::sin(robotAngle.value()) + 
                                                 robotVy * std::cos(robotAngle.value());
         
-        frc::Transform3d goalPose = frc::Transform3d(2_m, 2_m, 0.0_m, frc::Rotation3d());
         
 
-        double dx = robotPose.X().value() - goalPose.X().value();
-        double dy = robotPose.Y().value() - goalPose.Y().value();
-        double D = frc::SmartDashboard::GetNumber("/Turret/Pose/Target Distance", 0.0);
-        double vp = 0.0; //TODO, What is the projectiles Horizontal Velocity.
+        double dx = robotPose.X().value() - goal.X().value(); // distance x component
+        double dy = robotPose.Y().value() - goal.Y().value(); // distance y component
+        distanceToTarget = double(getDistanceFromTOF(tn)); // needs to grab distance using TOF
+        double vp = distanceToTarget/tn;
 
-        double E = tn - getTOF(D);
-        double dE = 1 + ((dx*robotVx + dy*robotVx)/(vp*D));
+        double E = tn - getTOF(distanceToTarget);
+        double dE = 1 + ((dx*robotWorldVx + dy*robotWorldVy)/(vp*distanceToTarget));
         
         tn = tn - (E/dE);
 
