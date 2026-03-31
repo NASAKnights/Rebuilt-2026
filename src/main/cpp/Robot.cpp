@@ -132,7 +132,7 @@ void Robot::AutonomousInit()
     auto m_autonomousCommand = autoChooser.GetSelected();
     m_swerveDrive.ResetPose(autoStartPose);
 
-    m_swerveDrive.InvertHeading();
+    // m_swerveDrive.InvertHeading();
 
     if (m_autonomousCommand)
     {

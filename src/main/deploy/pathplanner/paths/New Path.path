@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.388070199778024,
-        "y": 0.6428728496115435
+        "x": 3.60535329668424,
+        "y": 0.5450381520532743
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.8688049736404,
-        "y": 0.13022375312153256
+        "x": 8.086088070546616,
+        "y": 0.032389055563263436
       },
       "isLocked": false,
       "linkedName": "UltraRight1"
@@ -172,7 +172,7 @@
   "folder": "UltraRight",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
