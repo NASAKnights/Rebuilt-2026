@@ -63,7 +63,7 @@ namespace Turret_ShooterConstants {
   // Spindexer operates on a 5:1 gearbox. 
   // Native RPS is measured at the motor.
   static constexpr units::turns_per_second_t kSpindexerShootVelocity = -25_tps;
-  static constexpr double kIndexerShootVelocityRPM = -4000;
+  static constexpr double kIndexerShootVelocityRPM = -5800;
 }
 
 class Turret_Shooter : public frc2::SubsystemBase
