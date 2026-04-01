@@ -53,7 +53,7 @@ namespace Turret_ShooterConstants {
   static constexpr double kSpindexerI = 0.0;
   static constexpr double kSpindexerD = 0.0;
   static constexpr double kSpindexerS = 0.1;
-  static constexpr double kSpindexerV = 1.3;
+  static constexpr double kSpindexerV = 0.2;
 
   static constexpr double kIndexerP = 0.0001;
   static constexpr double kIndexerI = 0.0;
@@ -62,8 +62,8 @@ namespace Turret_ShooterConstants {
 
   // Spindexer operates on a 5:1 gearbox. 
   // Native RPS is measured at the motor.
-  static constexpr units::turns_per_second_t kSpindexerShootVelocity = -25_tps;
-  static constexpr double kIndexerShootVelocityRPM = -5800;
+  static constexpr units::turns_per_second_t kSpindexerShootVelocity = -27_tps;
+  static constexpr double kIndexerShootVelocityRPM = -6000;
 }
 
 class Turret_Shooter : public frc2::SubsystemBase
@@ -133,14 +133,14 @@ private:
 
   std::map<double, double> kFlywheelSpeedMap = {
       {1.0, 30.},
-      {1.5, 40.},
+      {1.5, 42.},
       {2.0, 45.},
-      {2.5, 45.5},
-      {3.0, 50.},
-      {3.5, 55.}, //8 deg extra
-      {4.0, 65.},
-      {4.5, 67.5}, //10 deg extra
-      {5.0, 71},
+      {2.5, 46.},
+      {3.0, 51.5},
+      {3.5, 57.}, //8 deg extra
+      {4.0, 66.5},
+      {4.5, 68.}, //10 deg extra
+      {5.0, 72},
       {5.5, 75.},
       {6.0, 80.},
       {6.5, 85.},

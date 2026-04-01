@@ -363,7 +363,7 @@ void Robot::BindCommands()
         frc2::JoystickButton(&m_operatorController, 1)
                 .OnTrue(frc2::CommandPtr(
                     frc2::InstantCommand([this]
-                                        { m_wrist.SetAngle(60);
+                                        { m_wrist.SetAngle(90);
                                         m_intake.Intake();
                                         return; })))
                 .OnFalse(frc2::CommandPtr(
