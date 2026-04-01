@@ -48,44 +48,28 @@
     },
     {
       "anchor": {
-        "x": 5.912883731617647,
-        "y": 3.4025348571032192
+        "x": 6.013195754716982,
+        "y": 3.412208223501665
       },
       "prevControl": {
-        "x": 6.606186861392271,
-        "y": 3.734551638135072
+        "x": 6.653091290439533,
+        "y": 3.8381637094440237
       },
       "nextControl": {
-        "x": 5.481632474334074,
-        "y": 3.196012416759157
+        "x": 5.686346073806883,
+        "y": 3.1946361247918977
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.417904238346282,
-        "y": 0.9672452049805782
+        "x": 3.557301045713097,
+        "y": 2.281997259988901
       },
       "prevControl": {
-        "x": 6.348692727049006,
-        "y": 1.6864831815568155
-      },
-      "nextControl": {
-        "x": 6.482825896573253,
-        "y": 0.2925868826304122
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 4.022841634295228,
-        "y": 0.5207760908018872
-      },
-      "prevControl": {
-        "x": 4.926043068465595,
-        "y": 0.6468837576304112
+        "x": 5.7236239248057705,
+        "y": 1.8672615063124303
       },
       "nextControl": null,
       "isLocked": false,
@@ -118,7 +102,7 @@
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 3.5842413651315774,
+      "waypointRelativePos": 3.3,
       "rotationDegrees": 90.0
     }
   ],
@@ -135,12 +119,25 @@
         "nominalVoltage": 12.0,
         "unlimited": false
       }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 3.5145321361058515,
+      "maxWaypointRelativePos": 4.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
     }
   ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 2.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

@@ -66,6 +66,7 @@ Turret_Shooter::Turret_Shooter()
     rev::spark::SparkFlexConfig indexerConfig{};
     indexerConfig.closedLoop.Pid(Turret_ShooterConstants::kIndexerP, Turret_ShooterConstants::kIndexerI, Turret_ShooterConstants::kIndexerD);
     indexerConfig.closedLoop.feedForward.kV(Turret_ShooterConstants::kIndexerkV);
+    // indexerConfig.SmartCurrentLimit(30);
     m_indexerMotor.Configure(indexerConfig, rev::spark::SparkBase::ResetMode::kResetSafeParameters, rev::spark::SparkBase::PersistMode::kPersistParameters);
 
     ctre::phoenix6::configs::TalonFXConfiguration spindexerConfig{};

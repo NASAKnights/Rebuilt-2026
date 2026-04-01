@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 8.086088070546616,
-        "y": 0.032389055563263436
+        "y": 0.03238905556326355
       },
       "isLocked": false,
       "linkedName": "UltraRight1"
@@ -41,7 +41,7 @@
       },
       "nextControl": {
         "x": 6.3471628312291895,
-        "y": 0.09282793423973401
+        "y": 0.09282793423973357
       },
       "isLocked": false,
       "linkedName": null
@@ -80,12 +80,12 @@
     },
     {
       "anchor": {
-        "x": 4.022841634295228,
-        "y": 0.5207760908018872
+        "x": 3.557301045713097,
+        "y": 2.281997259988901
       },
       "prevControl": {
-        "x": 4.926043068465595,
-        "y": 0.6468837576304112
+        "x": 4.4605024798834645,
+        "y": 2.4081049268174253
       },
       "nextControl": null,
       "isLocked": false,
@@ -157,7 +157,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 2.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

@@ -34,15 +34,28 @@
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "HalfRaiseIntake"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
                   "waitTime": 3.5
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.25
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "HalfRaiseIntake"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -84,9 +97,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "HalfRaiseIntake"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "HalfRaiseIntake"
+                      }
+                    }
+                  ]
                 }
               }
             ]
