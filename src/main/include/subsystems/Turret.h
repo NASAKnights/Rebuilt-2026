@@ -47,6 +47,7 @@
 #include <frc/smartdashboard/Field2d.h>
 
 #include "utils/BallisticsInterpolator.h"
+#include "utils/LaunchCalculator.h"
 #include "utils/ballistics_rv_hub.h"
 #include "utils/ballistics_rv_gnd.h"
 
@@ -335,6 +336,7 @@ private:
   bool presetShooting = false;
 
   std::string presetType = "middle";
+  LaunchCalculator m_launchCalculator;
 
   std::map<double, double> kHoodOffsetMap = {
       {1.0, 0.},
