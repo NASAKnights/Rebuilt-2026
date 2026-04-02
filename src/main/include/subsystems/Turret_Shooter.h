@@ -110,7 +110,7 @@ private:
   static constexpr int kGearRatio = 2;
   static constexpr units::inch_t kBallDiameter = units::inch_t{5.91};
 
-  double kP = 0.08;
+  double kP = 0.37;
   double kI = 0.0;
   double kD = 0.0;
   double kS = 0.6;
@@ -132,19 +132,19 @@ private:
   };
 
   std::map<double, double> kFlywheelSpeedMap = {
-      {1.0, 30.},
+      {1.0, 35.},
       {1.5, 42.},
       {2.0, 45.},
-      {2.5, 46.},
-      {3.0, 51.5},
-      {3.5, 57.}, //8 deg extra
-      {4.0, 66.5},
-      {4.5, 68.}, //10 deg extra
-      {5.0, 72},
-      {5.5, 75.},
-      {6.0, 80.},
-      {6.5, 85.},
-      {7.0, 90.}
+      {2.5, 50.},
+      {3.0, 60.},
+      {3.5, 78.}, //8 deg extra
+      {4.0, 83.},
+      {4.5, 88.}, //10 deg extra
+      {5.0, 90},
+      {5.5, 95.},
+      {6.0, 100.},
+      {6.5, 105.},
+      {7.0, 110.}
   };
   // std::map<double, double> kFlywheelSpeedMap;
 
