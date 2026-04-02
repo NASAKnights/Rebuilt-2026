@@ -15,6 +15,7 @@
 #include <frc/geometry/Rotation3d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/geometry/Transform3d.h>
+#include <frc/geometry/Twist3d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/controller/PIDController.h>
 #include <frc2/command/SubsystemBase.h>
@@ -46,6 +47,7 @@
 #include <frc/smartdashboard/Field2d.h>
 
 #include "utils/BallisticsInterpolator.h"
+#include "utils/LaunchCalculator.h"
 #include "utils/ballistics_rv_hub.h"
 #include "utils/ballistics_rv_gnd.h"
 
@@ -113,7 +115,7 @@ namespace TurretConstants
   const units::angle::radian_t kHoodStartAngle = units::angle::radian_t(0.0);
   const units::angle::radian_t kHoodMinAngle = 35_deg; //Needs to increase to fix skew to the right
   const units::angle::radian_t kHoodMaxAngle = 70_deg;
-  const double kHoodXOffset = 0.0;
+  const double kHoodXOffset = 0.1;
   const double kHoodYOffset = 0.0;
 
 
@@ -183,7 +185,11 @@ public:
   void ChangeHoodAngle(units::angle::radian_t launchAngle, units::meter_t distance);
   void ChangeHoodAngle(units::meter_t distance);
   void ChangeHoodAngle(double ballLaunchAngleDegrees);
+
   void SetHood(double extension);
+  double getTOF(double distance);
+  units::meter_t getDistanceFromTOF(double TOF);
+  double GetRobotVelocityShooterSpeedCorrection(double tn);
   double GetHoodAngle();
   void ChangeLaunchSpeed(units::meters_per_second_t speed, units::meter_t distance);
 
@@ -330,6 +336,7 @@ private:
   bool presetShooting = false;
 
   std::string presetType = "middle";
+  LaunchCalculator m_launchCalculator;
 
   std::map<double, double> kHoodOffsetMap = {
       {1.0, 0.},
@@ -356,6 +363,38 @@ private:
       {6.0, 40.},
       {6.5, 38.},
       {7.0, 35.}
+  };
+
+  std::map<double, double> kShotTOFMap = {
+      {1.0, 1.2574},
+      {1.5, 1.3077},
+      {2.0, 1.3580},
+      {2.5, 1.4083},
+      {3.0, 1.4586},
+      {3.5, 1.5089},
+      {4.0, 1.5592},
+      {4.5, 1.6095},
+      {5.0, 1.6598},
+      {5.5, 1.8},
+      {6.0, 1.85},
+      {6.5, 1.9},
+      {7.0, 2.0}
+  };
+
+  std::map<double, double> kDistanceFromTOFMap = {
+      {1.2574, 1.0},
+      {1.3077, 1.5},
+      {1.3580, 2.0},
+      {1.4083, 2.5},
+      {1.4586, 3.0},
+      {1.5089, 3.5},
+      {1.5592, 4.0},
+      {1.6095, 4.5},
+      {1.6598, 5.0},
+      {1.8, 5.5},
+      {1.85, 6.0},
+      {1.9, 6.5},
+      {2.0, 7.0}
   };
 
   std::vector<std::pair<double, double>> kHoodAngleVector;

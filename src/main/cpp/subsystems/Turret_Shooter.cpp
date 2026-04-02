@@ -89,6 +89,7 @@ void Turret_Shooter::SetMotorSpeed(units::turns_per_second_t motorSpeed) {
     ctre::phoenix::StatusCode leftStatus = m_leftMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
     ctre::phoenix::StatusCode rightStatus = m_rightMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Motor RPS", motorSpeed.value());
+    frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Motor RPM", motorSpeed.value() * 60.0);
 }
 
 void Turret_Shooter::SetSpeed(units::meters_per_second_t ballSpeed, units::meter_t distance) {
