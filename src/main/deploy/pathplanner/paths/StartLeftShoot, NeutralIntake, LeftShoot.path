@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.3382602663706997,
-        "y": 5.430048860640954
+        "x": 3.1761074934101003,
+        "y": 5.481600825471698
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.7085240357935625,
-        "y": 6.07026056118202
+        "x": 6.546371262832963,
+        "y": 6.121812526012764
       },
       "isLocked": false,
       "linkedName": "TopShootMain"
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 2.3382602663706997,
-        "y": 5.430048860640954
+        "x": 3.1761074934101003,
+        "y": 5.481600825471698
       },
       "prevControl": {
-        "x": 6.222470778995561,
-        "y": 6.438556291620422
+        "x": 7.0603180060349615,
+        "y": 6.490108256451166
       },
       "nextControl": null,
       "isLocked": false,
@@ -82,21 +82,21 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 2.5,
-    "maxAcceleration": 2.5,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAngularAcceleration": 540.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 138.79315274683572
+    "rotation": 100.0
   },
   "reversed": false,
   "folder": "LeftStart, ShootingNeutralIntaking",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 138.79315274683572
+    "rotation": 100.0
   },
   "useDefaultConstraints": true
 }

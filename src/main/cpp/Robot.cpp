@@ -41,6 +41,13 @@ void Robot::RobotPeriodic()
     frc2::CommandScheduler::GetInstance().Run();
     this->UpdateDashboard();
     m_POVloop.Poll();
+
+    if (frc::SmartDashboard::GetBoolean("/Turret/Shooter/Allow Shooting",false)){
+        m_pdh.SetSwitchableChannel(true);
+    }
+    else{
+        m_pdh.SetSwitchableChannel(false);
+    }
     
     m_VoltageLog.Append(m_pdh.GetVoltage());
     m_CurrentLog.Append(m_pdh.GetTotalCurrent());

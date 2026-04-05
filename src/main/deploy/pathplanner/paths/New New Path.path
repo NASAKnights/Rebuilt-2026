@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1909183806187578,
-        "y": 1.8870801106409543
+        "x": 2.8311694037874586,
+        "y": 2.2131040163706994
       },
       "isLocked": false,
       "linkedName": "UltraRight2"
     },
     {
       "anchor": {
-        "x": 1.2365188852663713,
-        "y": 2.28541832859323
+        "x": 2.2330722374445067,
+        "y": 2.736645480715872
       },
       "prevControl": {
-        "x": 1.3811475097114323,
-        "y": 1.5686061494173131
+        "x": 2.5325533695199787,
+        "y": 2.3210053066037744
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,21 +29,7 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.10690867202268436,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 0.5,
-        "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -56,12 +42,12 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 128.6960404429639
+    "rotation": 121.22831718883526
   },
   "reversed": false,
   "folder": "UltraRight",
   "idealStartingState": {
-    "velocity": 1.25,
+    "velocity": 1.0,
     "rotation": 180.0
   },
   "useDefaultConstraints": false

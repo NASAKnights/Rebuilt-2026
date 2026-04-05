@@ -13,7 +13,7 @@ m_turretIntake{_turretIntake}, m_wrist{_wrist} {
 
 // Called when the command is initially scheduled.
 void BetterHalfRaise::Initialize() {
-  m_timer.Reset();
+  m_timer.Restart();
   m_turretIntake->Intake();
 }
 
@@ -26,11 +26,13 @@ void BetterHalfRaise::Execute() {
   if (m_timer.HasElapsed(units::second_t{1.})){
     if (raise){
       raise = false;
+      m_wrist->SetAngle(3.0);
     }
     else if (!raise){
       raise = true;
+      m_wrist->SetAngle(35.0);
     }
-    m_timer.Reset();
+    m_timer.Restart();
   }
 
   // if ((time == units::time::second_t{1} || time == units::time::second_t{3}) && !raise)
@@ -42,14 +44,14 @@ void BetterHalfRaise::Execute() {
   //   raise = false;
   // }
 
-  if (raise)
-  {
-    m_wrist->SetAngle(35.0);
-  }
-  else if (!raise)
-  {
-    m_wrist->SetAngle(3.0);
-  }
+  // if (raise)
+  // {
+  //   m_wrist->SetAngle(35.0);
+  // }
+  // else if (!raise)
+  // {
+    
+  // }
   
   
 }

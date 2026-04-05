@@ -11,13 +11,32 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of New Path"
+                  "pathName": "StartLeftTrench, NeutralIntake, LeftShoot"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
                 }
               },
               {
@@ -33,7 +52,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Shoot"
+                        "name": "HalfRaiseIntake"
                       }
                     }
                   ]
@@ -43,13 +62,26 @@
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "New New Path"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "StartLeftShoot, NeutralHubIntake, LeftShoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "parallel",
+          "type": "race",
           "data": {
             "commands": [
               {
@@ -65,13 +97,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 2.0
+                        "waitTime": 1.25
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "BetterHalfRaise"
+                        "name": "HalfRaiseIntake"
                       }
                     }
                   ]
@@ -84,6 +116,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Ultras",
+  "folder": null,
   "choreoAuto": false
 }

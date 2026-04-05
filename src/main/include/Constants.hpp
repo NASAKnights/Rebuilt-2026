@@ -111,7 +111,7 @@ namespace DriveConstants
     const double kDefaultAxisDeadband = 0.15;
     const units::meters_per_second_t kMaxTranslationalVelocity{4}; // Add to shuffleboard
 
-    const units::radians_per_second_t kMaxRotationalVelocity{4}; // Add to shuffleboard
+    const units::radians_per_second_t kMaxRotationalVelocity{6}; // Add to shuffleboard
     const bool kIsFieldRelative = true;
 
     // ------------------------- MODULE OFFSETS -------------------------
