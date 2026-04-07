@@ -35,17 +35,17 @@
                       "data": {
                         "name": "Shoot"
                       }
+                    },
+                    {
+                      "type": "race",
+                      "data": {
+                        "commands": []
+                      }
                     }
                   ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "New New Path"
           }
         },
         {

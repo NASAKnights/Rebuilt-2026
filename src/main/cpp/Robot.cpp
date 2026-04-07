@@ -151,6 +151,7 @@ void Robot::AutonomousPeriodic() {}
 
 void Robot::AutonomousExit()
 {
+    m_swerveDrive.InvertHeading();
 }
 
 void Robot::TeleopInit()

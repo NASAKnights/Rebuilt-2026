@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.707110328801317,
-        "y": -0.04605958657047737
+        "x": 8.80962441904492,
+        "y": -0.0012711136921574884
       },
       "isLocked": false,
       "linkedName": "UltraRight1"
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 3.557301045713097,
-        "y": 2.281997259988901
+        "x": 2.8478421979051056,
+        "y": 2.840339249791898
       },
       "prevControl": {
-        "x": 8.143538429522753,
-        "y": 1.8032049458934525
+        "x": 7.54233477559656,
+        "y": 1.8282534596975584
       },
       "nextControl": null,
       "isLocked": false,
@@ -50,7 +50,7 @@
       "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 0.3744089226973685,
+      "waypointRelativePos": 0.3631527549342105,
       "rotationDegrees": 90.0
     },
     {
@@ -92,6 +92,19 @@
         "nominalVoltage": 12.0,
         "unlimited": false
       }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.07260160680529298,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 540.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
     }
   ],
   "pointTowardsZones": [],
@@ -105,7 +118,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.0,
+    "velocity": 0.0,
     "rotation": 180.0
   },
   "reversed": false,

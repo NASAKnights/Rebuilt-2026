@@ -85,6 +85,7 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
     m_visionPoseEstimator = PoseEstimator();
     pvPoseEstimation1.SetRobotToCameraTransform(robot2Camera1);
     pvPoseEstimation2.SetRobotToCameraTransform(robot2Camera2);
+    pvPoseEstimation3.SetRobotToCameraTransform(robot2Camera3);
 
     timer.Start();
 
@@ -325,6 +326,16 @@ void SwerveDrive::ResetHeading()
     }
 }
 
+void SwerveDrive::InvertHeading()
+{
+    if (enable == true)
+    {
+        // navx.Reset();
+        m_pigeon.SetYaw(180_deg);
+        m_simAngle = frc::Rotation2d();
+    }
+}
+
 void SwerveDrive::ResetDriveEncoders()
 {
     for (auto &module : modules)
@@ -429,6 +440,26 @@ void SwerveDrive::UpdatePoseEstimate()
         if (estimatedRobotPose2){
             m_poseEstimator.AddVisionMeasurement(estimatedRobotPose2->estimatedPose.ToPose2d(), 
             estimatedRobotPose2->timestamp);
+        }
+
+    }
+
+    auto results3 = jetsonCamera3.GetAllUnreadResults();
+    for (auto &result : results3) {
+        // auto multiTagResult = result.MultiTagResult();
+        // auto singleTagResult = result.GetBestTarget();
+        if(result.GetBestTarget().GetPoseAmbiguity() > 0.2)
+        {
+            continue;
+        }
+        auto estimatedRobotPose3 = pvPoseEstimation3.EstimateCoprocMultiTagPose(result);
+        if (!estimatedRobotPose3){
+            estimatedRobotPose3 = pvPoseEstimation3.EstimateLowestAmbiguityPose(result);
+        }
+
+        if (estimatedRobotPose3){
+            m_poseEstimator.AddVisionMeasurement(estimatedRobotPose3->estimatedPose.ToPose2d(), 
+            estimatedRobotPose3->timestamp);
         }
 
     }
@@ -617,10 +648,6 @@ void SwerveDrive::ToggleFieldRelative()
     m_fieldRelative = !m_fieldRelative;
 }
 
-void SwerveDrive::InvertHeading()
-{
-    m_pigeon.SetYaw(180_deg);
-}
 
 bool SwerveDrive::atSetpoint()
 {
