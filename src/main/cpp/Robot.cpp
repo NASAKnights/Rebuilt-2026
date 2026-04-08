@@ -124,6 +124,7 @@ void Robot::DisabledInit()
     else {
         LoadCSVToMap(csvName);
     }
+    m_led.DefaultAnimation();
     firstBoot = false;
 }
 

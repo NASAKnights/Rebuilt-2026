@@ -5,7 +5,12 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
-#include <ctre/phoenix/led/CANdle.h>
+#include <ctre/phoenix6/CANdle.hpp>
+#include <ctre/phoenix6/configs/CANdleFeaturesConfigs.hpp>
+#include <ctre/phoenix6/signals/RGBWColor.hpp>
+#include <ctre/phoenix6/controls/RainbowAnimation.hpp>
+#include <ctre/phoenix6/controls/EmptyAnimation.hpp>
+#include <ctre/phoenix6/signals/SpnEnums.hpp>
 #include <frc/DigitalInput.h>
 #include <frc2/command/button/Trigger.h>
 #include "subsystems/LED_Groups.h"
@@ -33,6 +38,7 @@ public:
   void DefaultAnimation();
   void TeleopLED();
 
+  void ClearLEDs();
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */
@@ -40,7 +46,8 @@ public:
 
   LEDIntakeState m_intakeState = LEDIntakeState::NO_NOTE;
   LEDShooterState m_shooterState = LEDShooterState::LED_BAD;
-  ctre::phoenix::led::CANdle candle{60};
+  ctre::phoenix6::hardware::CANdle m_candle{60, ctre::phoenix6::CANBus::RoboRIO()};
+  ctre::phoenix6::configs::CANdleConfiguration candleConfig;
 
 private:
   LEDIntakeState m_intakeStatePrev = LEDIntakeState::NO_NOTE;
@@ -57,8 +64,8 @@ private:
   bool P_state;
   bool C_state;
 
-  std::vector<int> group1 = {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22};
-  LED_Group ledGroup1 = LED_Group(&candle, group1, 0);
+  // std::vector<int> group1 = {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22};
+  // LED_Group ledGroup1 = LED_Group(&candle, group1, 0);
 
   // std::vector<int> group2 = {34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59};
   // LED_Group ledGroup2 = LED_Group(&candle, group2, 1);

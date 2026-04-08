@@ -99,6 +99,7 @@ private:
     // Climber m_climber;
     Turret m_turret;
     TurretIntake m_intake;
+    LEDController m_led;
 
     std::string_view baseLink = "base_link";
     nt::StructPublisher<frc::Pose3d> stageOne3dPOS;
