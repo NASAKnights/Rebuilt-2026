@@ -15,6 +15,8 @@
 #include <frc2/command/button/Trigger.h>
 #include "subsystems/LED_Groups.h"
 #include <frc/DriverStation.h>
+#include <utility>
+#include <vector>
 
 using RGBWColor = ctre::phoenix6::signals::RGBWColor;
 enum LEDState
@@ -42,14 +44,10 @@ class LEDController : public frc2::SubsystemBase
 {
 public:
   LEDController();
-  void HandleIntakeState();
-  void HandleShooterState();
   void DefaultAnimation();
   void TeleopLED();
   void RedAlliance();
   void BlueAlliance();
-  void Last10SecondsBlue();
-  void Last5SecondsBlue();
   void Last10SecondsRed();
   void Last5SecondsRed();
   void TeleopInit();
@@ -75,14 +73,16 @@ private:
   LEDShooterState m_shooterStatePrev = LEDShooterState::LED_BAD;
 
   frc::Timer m_timer;
-  std::vector<int> times = {10, 15, 5, 5, 15, 5, 5, 15, 5, 5, 15, 5, 5, 30};
-  std::vector<std::pair<LEDState, units::frequency::hertz_t>> states = {
+  const std::vector<int> m_defaultTimes = {10, 15, 5, 5, 15, 5, 5, 15, 5, 5, 15, 5, 5, 30};
+  const std::vector<std::pair<LEDState, units::frequency::hertz_t>> m_defaultStates = {
     {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
     {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
     {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
     {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
     {LEDState::FIRE, 2_Hz}    // Endgame
   };
+  std::vector<int> times = m_defaultTimes;
+  std::vector<std::pair<LEDState, units::frequency::hertz_t>> states = m_defaultStates;
 
   units::time::second_t Time{0.2};
   units::time::second_t Speed{0.1};
