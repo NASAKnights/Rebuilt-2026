@@ -100,7 +100,6 @@ void Robot::RobotPeriodic()
 // This function is called once each time the robot enters Disabled mode.
 void Robot::DisabledInit()
 {
-    // m_LED_Controller.DefaultAnimation();
     if constexpr (frc::RobotBase::IsSimulation())
     {
         m_swerveDrive.ResetPose(frc::Pose2d());
@@ -162,6 +161,7 @@ void Robot::TeleopInit()
     // continue until interrupted by another command, remove
     // this line or comment it out.
     // m_wrist.HoldPosition();
+    m_led.TeleopInit();
     m_turret.Reset();
     /*
     if (m_wrist.GetState() != WristConstants::WristState::ZEROING)
@@ -180,7 +180,7 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic()
 {
-
+    m_led.TeleopPeriodic();
 }
 
 void Robot::TeleopExit()
@@ -656,7 +656,6 @@ std::string Robot::CheckActiveHub()
         }
         
     } 
-
 }
 
 void Robot::LoadCSVToMap(const std::string& filename) {

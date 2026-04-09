@@ -43,6 +43,41 @@ void LEDController::DefaultAnimation()
     // ledGroup4.SetRainbow(4);
 }
 
+void LEDController::RedAlliance()
+{
+    m_candle.SetControl(ctre::phoenix6::controls::SolidColor{0, 77}.WithColor(kRed));
+}
+
+void LEDController::BlueAlliance()
+{
+    m_candle.SetControl(ctre::phoenix6::controls::SolidColor{0, 77}.WithColor(kBlue));
+}
+
+void LEDController::Last10SecondsRed()
+{
+    m_candle.SetControl(ctre::phoenix6::controls::StrobeAnimation{0, 77}.WithColor(kWhite).FrameRate());
+}
+
+void LEDController::Last5SecondsRed()
+{
+    m_candle.SetControl(ctre::phoenix6::controls::StrobeAnimation{0, 77}.WithColor(kWhite).FrameRate());
+}
+
+void LEDController::SetStrobe(RGBWColor color, units::frequency::hertz_t speed)
+{
+    m_candle.SetControl(ctre::phoenix6::controls::StrobeAnimation(0, 77).WithColor(color).WithFrameRate(speed));
+}
+
+void LEDController::SetStatic(RGBWColor color)
+{
+    m_candle.SetControl(ctre::phoenix6::controls::SolidColor(0, 77).WithColor(color).WithUpdateFreqHz(20_Hz));
+}
+
+void LEDController::SetFire(units::frequency::hertz_t speed)
+{
+    m_candle.SetControl(ctre::phoenix6::controls::FireAnimation(0, 77).WithFrameRate(speed).WithBrightness(1.0).WithFrameRate(8_Hz));
+}
+
 void LEDController::TeleopLED()
 {
     // for (int i = 0; i < 10; i++)
@@ -53,5 +88,66 @@ void LEDController::TeleopLED()
 }
 
 
+void LEDController::TeleopInit()
+{
+    auto GameData = frc::DriverStation::GetGameSpecificMessage();
+    if(GameData.length() > 0)
+    {
+        switch (GameData[0])
+        {
+            case 'B' :
+                activeHub = frc::DriverStation::Alliance::kRed;
+                break;
+            case 'R' :
+                activeHub = frc::DriverStation::Alliance::kBlue;
+                break;
+            default :
+                activeHub = frc::DriverStation::Alliance::kBlue;
+                break;
+        }
+    }
+    m_timer.Reset();
+    SetStatic(frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kBlue ? kBlue : kRed);
+}
 
-void LEDController::Periodic() {}
+
+void LEDController::TeleopPeriodic() {
+    auto time = units::second_t{times.front()};
+    if(times.size() <= 0 || states.size() <=0)
+    {
+        return;
+    }
+    if(m_timer.HasElapsed(time))
+    {
+        times.erase(times.begin());
+
+        auto current_state = states.front();
+        states.erase(states.begin());
+
+        // Set State
+        // Color  = activeHub
+        if(times.front() == 15)
+        {
+            activeHub = activeHub == frc::DriverStation::Alliance::kBlue ? frc::DriverStation::Alliance::kRed : frc::DriverStation::Alliance::kBlue;
+        }
+        auto color = activeHub == frc::DriverStation::kBlue ? kBlue : kRed;
+
+        switch (current_state.first)
+        {
+        case LEDState::BLINK:
+            SetStrobe(color, current_state.second);
+            break;
+        case LEDState::FIRE:
+            SetFire(current_state.second);
+            break;
+        case LEDState::STATIC:
+            SetStatic(color);
+            break;
+        default:
+            break;
+        }
+
+        // Reset Timer
+        m_timer.Reset();
+    }
+}

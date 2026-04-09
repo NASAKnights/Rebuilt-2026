@@ -14,6 +14,15 @@
 #include <frc/DigitalInput.h>
 #include <frc2/command/button/Trigger.h>
 #include "subsystems/LED_Groups.h"
+#include <frc/DriverStation.h>
+
+using RGBWColor = ctre::phoenix6::signals::RGBWColor;
+enum LEDState
+{
+  STATIC,
+  BLINK,
+  FIRE
+};
 
 enum LEDIntakeState
 {
@@ -37,21 +46,43 @@ public:
   void HandleShooterState();
   void DefaultAnimation();
   void TeleopLED();
+  void RedAlliance();
+  void BlueAlliance();
+  void Last10SecondsBlue();
+  void Last5SecondsBlue();
+  void Last10SecondsRed();
+  void Last5SecondsRed();
+  void TeleopInit();
+
+  void SetStrobe(RGBWColor color, units::frequency::hertz_t speed);
+  void SetStatic(RGBWColor color);
+  void SetFire(units::frequency::hertz_t speed);
 
   void ClearLEDs();
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */
-  void Periodic() override;
+  void TeleopPeriodic();
 
   LEDIntakeState m_intakeState = LEDIntakeState::NO_NOTE;
   LEDShooterState m_shooterState = LEDShooterState::LED_BAD;
   ctre::phoenix6::hardware::CANdle m_candle{60, ctre::phoenix6::CANBus::RoboRIO()};
   ctre::phoenix6::configs::CANdleConfiguration candleConfig;
+  frc::DriverStation::Alliance activeHub = frc::DriverStation::Alliance::kBlue;
 
 private:
   LEDIntakeState m_intakeStatePrev = LEDIntakeState::NO_NOTE;
   LEDShooterState m_shooterStatePrev = LEDShooterState::LED_BAD;
+
+  frc::Timer m_timer;
+  std::vector<int> times = {10, 15, 5, 5, 15, 5, 5, 15, 5, 5, 15, 5, 5, 30};
+  std::vector<std::pair<LEDState, units::frequency::hertz_t>> states = {
+    {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
+    {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
+    {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
+    {LEDState::STATIC, 5_Hz}, {LEDState::BLINK, 5_Hz}, {LEDState::BLINK, 10_Hz},
+    {LEDState::FIRE, 2_Hz}    // Endgame
+  };
 
   units::time::second_t Time{0.2};
   units::time::second_t Speed{0.1};
@@ -60,6 +91,11 @@ private:
   int _g = 0;
   int _b = 0;
   int i = 0;
+
+
+  static constexpr RGBWColor kBlue{11, 61, 145, 0};
+  static constexpr RGBWColor kRed{255, 0, 0, 0};
+  static constexpr RGBWColor kWhite{0, 0, 0, 255};
 
   bool P_state;
   bool C_state;

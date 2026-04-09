@@ -156,7 +156,7 @@ private:
   
   photon::PhotonCamera jetsonCamera1{"Arducam_B0495_camera1"};
   photon::PhotonCamera jetsonCamera2{"Arducam_B0495_camera2"};
-  photon::PhotonCamera jetsonCamera3{"Arducam_OV9281_USB_Camera"}; // This is the third camera - 
+  photon::PhotonCamera jetsonCamera3{"Arducam_OV9281_porygon"}; // This is the third camera - 
   photon::PhotonPoseEstimator pvPoseEstimation1{kTagLayout, frc::Transform3d{}};
   photon::PhotonPoseEstimator pvPoseEstimation2{kTagLayout, frc::Transform3d{}};
   photon::PhotonPoseEstimator pvPoseEstimation3{kTagLayout, frc::Transform3d{}};
