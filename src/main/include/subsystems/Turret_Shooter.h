@@ -99,8 +99,8 @@ public:
   void StopAll();
 
 private:
-  ctre::phoenix6::hardware::TalonFXS m_leftMotor{Turret_ShooterConstants::kMotorIdLeft};
-  ctre::phoenix6::hardware::TalonFXS m_rightMotor{Turret_ShooterConstants::kMotorIdRight};
+  ctre::phoenix6::hardware::TalonFX m_leftMotor{Turret_ShooterConstants::kMotorIdLeft};
+  ctre::phoenix6::hardware::TalonFX m_rightMotor{Turret_ShooterConstants::kMotorIdRight};
 
   ctre::phoenix6::hardware::TalonFX m_spindexerMotor{Turret_ShooterConstants::kSpindexerMotorId};
   rev::spark::SparkFlex m_indexerMotor{Turret_ShooterConstants::kIndexerMotorId, rev::spark::SparkFlex::MotorType::kBrushless};
