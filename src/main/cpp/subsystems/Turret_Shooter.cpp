@@ -9,10 +9,10 @@ Turret_Shooter::Turret_Shooter()
 {
     ctre::phoenix6::configs::TalonFXConfiguration leftMotorConfig{};
     ctre::phoenix6::configs::TalonFXConfiguration rightMotorConfig{};
-    // ctre::phoenix6::controls::Follower LeftFollower{m_rightMotor.GetDeviceID(), true};
+    ctre::phoenix6::controls::Follower LeftFollower{m_rightMotor.GetDeviceID(), true};
     // leftMotorConfig.Commutation.WithMotorArrangement(ctre::phoenix6::signals::MotorArrangementValue::Minion_JST);
     // rightMotorConfig.Commutation.WithMotorArrangement(ctre::phoenix6::signals::MotorArrangementValue::Minion_JST);
-    // m_leftMotor.SetControl(LeftFollower);
+    m_leftMotor.SetControl(LeftFollower);
     ctre::phoenix6::configs::Slot0Configs motorSlot0Configs{};
     motorSlot0Configs.kP = kP;
     motorSlot0Configs.kI = kI;
