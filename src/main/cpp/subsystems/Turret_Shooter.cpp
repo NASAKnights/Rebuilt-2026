@@ -89,7 +89,7 @@ void Turret_Shooter::SetMotorSpeed(units::turns_per_second_t motorSpeed) {
     ctre::phoenix::StatusCode leftStatus = m_leftMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
     ctre::phoenix::StatusCode rightStatus = m_rightMotor.SetControl(motorRequest.WithVelocity(motorSpeed).WithSlot(0));
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Motor RPS", motorSpeed.value());
-    frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Motor RPM", motorSpeed.value() * 60.0);
+    // frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Motor RPM", motorSpeed.value() * 60.0);
 }
 
 void Turret_Shooter::SetSpeed(units::meters_per_second_t ballSpeed, units::meter_t distance) {
@@ -176,7 +176,7 @@ void Turret_Shooter::StopMotors()
     m_leftMotor.SetControl(motorVoltageRequest.WithOutput(0_V));
     m_rightMotor.SetControl(motorVoltageRequest.WithOutput(0_V));
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Ball Speed MPS", 0.0);
-    frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Motor RPM", 0.0);
+    // frc::SmartDashboard::PutNumber("/Turret/Shooter/Commanded Motor RPM", 0.0);
 }
 
 void Turret_Shooter::RunAll()
@@ -292,7 +292,8 @@ void Turret_Shooter::Periodic()
     double baselineGain = kFlyWheelGainMap.empty() ? 1.95 : kFlyWheelGainMap.begin()->second;
     units::meters_per_second_t ballSpeed = units::radians_per_second_t{motorSpeed} * (kFlywheelDiameter * kGearRatio) / (baselineGain * units::radian_t{1} * 4.0); 
 
-    frc::SmartDashboard::PutNumber("/Turret/Shooter/Actual Motor RPM", motorSpeed.value() * 60.0);
+    frc::SmartDashboard::PutNumber("/Turret/Shooter/Actual Motor RPS", motorSpeed.value());
+    // frc::SmartDashboard::PutNumber("/Turret/Shooter/Actual Motor RPM", motorSpeed.value() * 60.0);
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Actual Ball Speed MPS", ballSpeed.value()); 
 
     frc::SmartDashboard::PutNumber("/Turret/Spindexer/Actual Motor RPS", m_spindexerMotor.GetVelocity().GetValue().value());

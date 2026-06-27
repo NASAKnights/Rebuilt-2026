@@ -667,7 +667,7 @@ void Turret::Periodic()
         // Hood/Launch Angle
         if (Flatten)
         {
-            SetHood(0.1);
+            SetHood(0.3);
             frc::SmartDashboard::PutNumber("/Turret/Hood/Launch Angle", 92.44086);
         }
         else if (allowShooting)
@@ -701,7 +701,7 @@ void Turret::Periodic()
         }
         else
         {
-            SetHood(0.1);
+            SetHood(0.3);
             frc::SmartDashboard::PutNumber("/Turret/Hood/Launch Angle", 92.44086);
         }
 

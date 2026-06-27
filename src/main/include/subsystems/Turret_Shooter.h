@@ -115,7 +115,7 @@ private:
   double kD = 0.0;
   double kS = 0.6;
   double kA = 0.005;
-  double kV = 0.1;
+  double kV = 0.2;
 
   // determines how much faster the flywheel needs to spin
   // so that the exit velocity meets the specified speed 
@@ -152,8 +152,8 @@ private:
 
 
   bool kEnableCurrentLimit = true;
-  units::ampere_t kPeakCurrentLimit = units::ampere_t{53};
-  units::ampere_t kContinousCurrentLimit = units::ampere_t{40};
+  units::ampere_t kPeakCurrentLimit = units::ampere_t{40};
+  units::ampere_t kContinousCurrentLimit = units::ampere_t{35};
   units::second_t kPeakCurrentDuration = units::second_t{0.1};
 
   frc::Timer m_simTimer;
