@@ -1,26 +1,14 @@
 #include "utils/LaunchCalculator.h"
+#include "utils/DeployFileUtils.h"
 
 #include <cmath>
 #include <algorithm>
 
-LaunchCalculator::LaunchCalculator() {
-  m_shotTable = {
-      {1.0, {61.0, 18.0, 1.06}},
-      {1.5, {58.0, 18.0, 1.00}},
-      {2.0, {58.0, 23.0, 1.25}},
-      {2.5, {58.0, 25.0, 1.62}},
-      {3.0, {56.0, 25.0, 1.40}},
-      {3.5, {53.0, 27.0, 1.38}},
-      {4.0, {50.0, 27.0, 1.41}},
-      {4.5, {45.5, 30.0, 1.6095}},
-      {5.0, {40.0, 33.0, 1.6598}},
-      {5.5, {35.0, 37.0, 1.8}},
-      {6.0, {30.0, 41.0, 1.85}},
-      {6.5, {30.0, 45.0, 1.9}},
-      {7.0, {30.0, 49.0, 2.0}},
-      {8.0, {30.0, 50.0, 2.0}},
-  };
-}
+LaunchCalculator::LaunchCalculator()
+    : m_ntMap("LaunchCalculator/Points",
+              "Distance",
+              std::array<std::string, 3>{"HoodAngle", "FlywheelRps", "TOF"},
+              utils::DeployFileUtils::ResolveDeployFilePathFromNtPath("LaunchCalculator/Points").string()) {}
 
 LaunchCalculator::LaunchingParameters LaunchCalculator::CalculateParameters(
     const frc::Pose2d& robotPose,
@@ -65,6 +53,7 @@ LaunchCalculator::LaunchingParameters LaunchCalculator::CalculateParameters(
   }
 
   frc::Rotation2d turretAngle = (target - lookaheadPose.Translation()).Angle();
+  const bool hasLaunchMap = !m_ntMap.GetMap().empty();
   const auto shot = GetShotForDistance(lookaheadDistance);
   const double hoodAngleDeg = shot.hoodAngleDeg;
 
@@ -97,7 +86,8 @@ LaunchCalculator::LaunchingParameters LaunchCalculator::CalculateParameters(
   m_lastHoodAngleDeg = hoodAngleDeg;
 
   return LaunchingParameters{
-      .isValid = lookaheadDistance.value() >= m_minDistanceMeters &&
+      .isValid = hasLaunchMap &&
+                 lookaheadDistance.value() >= m_minDistanceMeters &&
                  lookaheadDistance.value() <= m_maxDistanceMeters,
       .turretAngle = turretAngle,
       .turretVelocityRadPerSec = mean(m_turretVelocityWindow),
@@ -136,10 +126,11 @@ LaunchCalculator::ShotPoint LaunchCalculator::GetShotForDistance(units::meter_t 
   std::map<double, double> flywheel;
   std::map<double, double> tof;
 
-  for (const auto& [d, shot] : m_shotTable) {
-    hood[d] = shot.hoodAngleDeg;
-    flywheel[d] = shot.flywheelRps;
-    tof[d] = shot.tofSec;
+  auto currentMap = m_ntMap.GetMap();
+  for (const auto& [d, values] : currentMap) {
+    hood[d] = std::get<0>(values);
+    flywheel[d] = std::get<1>(values);
+    tof[d] = std::get<2>(values);
   }
 
   const double distanceMeters = distance.value();
@@ -156,8 +147,9 @@ double LaunchCalculator::GetTOF(double distanceMeters) const {
 
 units::meter_t LaunchCalculator::GetDistanceFromTOF(double tofSec) const {
   std::map<double, double> tofToDistance;
-  for (const auto& [distance, shot] : m_shotTable) {
-    tofToDistance[shot.tofSec] = distance;
+  auto currentMap = m_ntMap.GetMap();
+  for (const auto& [distance, values] : currentMap) {
+    tofToDistance[std::get<2>(values)] = distance;
   }
   return units::meter_t{InterpolateFromMap(tofToDistance, tofSec)};
 }
@@ -208,32 +200,51 @@ double LaunchCalculator::CompensateTOFForRobotMotion(
 
 std::map<double, double> LaunchCalculator::GetHoodAngleMap() const {
   std::map<double, double> hood;
-  for (const auto& [distance, shot] : m_shotTable) {
-    hood[distance] = shot.hoodAngleDeg;
+  auto currentMap = m_ntMap.GetMap();
+  for (const auto& [distance, values] : currentMap) {
+    hood[distance] = std::get<0>(values);
   }
   return hood;
 }
 
 void LaunchCalculator::SetHoodAngleMap(const std::map<double, double>& hoodAngleMapDeg) {
+  auto currentMap = m_ntMap.GetMap();
   for (const auto& [distance, angleDeg] : hoodAngleMapDeg) {
-    auto it = m_shotTable.find(distance);
-    if (it != m_shotTable.end()) {
-      it->second.hoodAngleDeg = angleDeg;
+    auto it = currentMap.find(distance);
+    if (it != currentMap.end()) {
+      auto values = it->second;
+      std::get<0>(values) = angleDeg;
+      m_ntMap.Set(distance, values);
     }
   }
 }
 
 void LaunchCalculator::AdjustHoodAngleAtDistance(double distanceMeters, double deltaDeg) {
-  if (m_shotTable.empty()) {
+  auto currentMap = m_ntMap.GetMap();
+  if (currentMap.empty()) {
     return;
   }
 
-  auto itHigh = m_shotTable.lower_bound(distanceMeters);
-  if (itHigh == m_shotTable.end()) {
-    itHigh = std::prev(m_shotTable.end());
+  auto itHigh = currentMap.lower_bound(distanceMeters);
+  if (itHigh == currentMap.end()) {
+    itHigh = std::prev(currentMap.end());
   }
 
-  if (itHigh != m_shotTable.end()) {
-    itHigh->second.hoodAngleDeg += deltaDeg;
+  if (itHigh != currentMap.end()) {
+    auto values = itHigh->second;
+    std::get<0>(values) += deltaDeg;
+    m_ntMap.Set(itHigh->first, values);
   }
+}
+
+void LaunchCalculator::UpdateFromNetworkTables() const {
+  m_ntMap.UpdateFromNetworkTables();
+}
+
+void LaunchCalculator::PublishCurrentTable() const {
+  m_ntMap.PublishCurrentTable();
+}
+
+void LaunchCalculator::SaveToFile() const {
+  m_ntMap.SaveToFile();
 }

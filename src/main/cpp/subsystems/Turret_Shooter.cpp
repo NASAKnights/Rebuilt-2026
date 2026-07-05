@@ -7,6 +7,16 @@
 
 Turret_Shooter::Turret_Shooter()
 {
+    wpi::log::DataLog& log = frc::DataLogManager::GetLog();
+    m_LeftMotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Turret/Shooter/LeftMotorCurrent");
+    m_LeftMotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Turret/Shooter/LeftMotorVoltage");
+    m_RightMotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Turret/Shooter/RightMotorCurrent");
+    m_RightMotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Turret/Shooter/RightMotorVoltage");
+    m_SpindexerMotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Turret/Spindexer/MotorCurrent");
+    m_SpindexerMotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Turret/Spindexer/MotorVoltage");
+    m_IndexerMotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Turret/Indexer/MotorCurrent");
+    m_IndexerMotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Turret/Indexer/MotorVoltage");
+
     ctre::phoenix6::configs::TalonFXConfiguration leftMotorConfig{};
     ctre::phoenix6::configs::TalonFXConfiguration rightMotorConfig{};
     ctre::phoenix6::controls::Follower LeftFollower{m_rightMotor.GetDeviceID(), true};
@@ -285,6 +295,10 @@ void Turret_Shooter::Periodic()
 {
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Left Motor Voltage", m_leftMotor.GetMotorVoltage().GetValue().value());
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Right Motor Voltage", m_rightMotor.GetMotorVoltage().GetValue().value());
+    m_LeftMotorCurrentLog.Append(m_leftMotor.GetSupplyCurrent().GetValue().value());
+    m_LeftMotorVoltageLog.Append(m_leftMotor.GetMotorVoltage().GetValue().value());
+    m_RightMotorCurrentLog.Append(m_rightMotor.GetSupplyCurrent().GetValue().value());
+    m_RightMotorVoltageLog.Append(m_rightMotor.GetMotorVoltage().GetValue().value());
 
     // left and right motors are same speed
     units::turns_per_second_t motorSpeed = m_leftMotor.GetVelocity().GetValue();
@@ -300,6 +314,10 @@ void Turret_Shooter::Periodic()
     frc::SmartDashboard::PutNumber("/Turret/Spindexer/Commanded Motor RPS", Turret_ShooterConstants::kSpindexerShootVelocity.value());
     frc::SmartDashboard::PutNumber("/Turret/Indexer/Actual Motor RPM", m_indexerMotor.GetEncoder().GetVelocity());
     frc::SmartDashboard::PutNumber("/Turret/Indexer/Commanded Motor RPM", Turret_ShooterConstants::kIndexerShootVelocityRPM);
+    m_SpindexerMotorCurrentLog.Append(m_spindexerMotor.GetSupplyCurrent().GetValue().value());
+    m_SpindexerMotorVoltageLog.Append(m_spindexerMotor.GetMotorVoltage().GetValue().value());
+    m_IndexerMotorCurrentLog.Append(m_indexerMotor.GetOutputCurrent());
+    m_IndexerMotorVoltageLog.Append(m_indexerMotor.GetAppliedOutput() * m_indexerMotor.GetBusVoltage());
 
     bool override = frc::SmartDashboard::GetBoolean("/Turret/Shooter/Ball Speed Manual Override", false);
     if (override) {

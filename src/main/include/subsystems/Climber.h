@@ -76,6 +76,8 @@ class Climber : public frc2::SubsystemBase
     wpi::log::DoubleLogEntry m_PositionInchesLog;
     wpi::log::IntegerLogEntry m_StateLog;
     wpi::log::BooleanLogEntry m_LimitSwitchLog;
+    wpi::log::DoubleLogEntry m_MotorCurrentLog;
+    wpi::log::DoubleLogEntry m_MotorVoltageLog;
 
     units::time::second_t time_brake_released;
 };

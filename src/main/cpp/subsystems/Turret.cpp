@@ -832,8 +832,8 @@ void Turret::printLog()
     m_AngleLog.Append(GetMeasurement().value());
     m_SetPointLog.Append(m_controller.GetSetpoint());
     m_StateLog.Append(m_TurretState);
-    // m_MotorCurrentLog.Append(m_motor.GetOutputCurrent());
-    // m_MotorVoltageLog.Append(m_motor.GetAppliedOutput());
+    m_MotorCurrentLog.Append(m_motor.GetOutputCurrent());
+    m_MotorVoltageLog.Append(m_motor.GetAppliedOutput());
 
     // Turret Shooter values output in shooter class
 }

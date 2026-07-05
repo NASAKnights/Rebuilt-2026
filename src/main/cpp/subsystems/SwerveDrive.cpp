@@ -2,6 +2,10 @@
 
 #include "subsystems/SwerveDrive.hpp"
 
+#include <exception>
+
+#include <frc/Errors.h>
+
 SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
     : m_canBus{canBus}, 
     modules{{SwerveModule(ElectricalConstants::kFrontLeftDriveMotorID,
@@ -101,7 +105,20 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
 
     SetOffsets();
 
-    pathplanner::RobotConfig pathplannerConfig = pathplanner::RobotConfig::fromGUISettings();
+    pathplanner::RobotConfig pathplannerConfig;
+    try
+    {
+        pathplannerConfig = pathplanner::RobotConfig::fromGUISettings();
+    }
+    catch (const std::exception& e)
+    {
+        FRC_ReportWarning("Failed to load PathPlanner robot config, using defaults: {}", e.what());
+    }
+    catch (...)
+    {
+        FRC_ReportWarning("Failed to load PathPlanner robot config, using defaults: unknown error");
+    }
+
     // Configure Auto Swerve
     pathplanner::AutoBuilder::configure(
         [this]()

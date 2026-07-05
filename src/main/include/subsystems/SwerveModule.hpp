@@ -9,11 +9,13 @@
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/simulation/SimDeviceSim.h>
+#include <frc/DataLogManager.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/math.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
+#include <wpi/DataLog.h>
 
 #include "Constants.hpp"
 
@@ -63,4 +65,9 @@ private:
   double m_driveSimVelocity;
   double m_driveSimPosition;
   double m_steerSimPosition;
+
+  wpi::log::DoubleLogEntry m_driveMotorCurrentLog;
+  wpi::log::DoubleLogEntry m_driveMotorVoltageLog;
+  wpi::log::DoubleLogEntry m_steerMotorCurrentLog;
+  wpi::log::DoubleLogEntry m_steerMotorVoltageLog;
 };

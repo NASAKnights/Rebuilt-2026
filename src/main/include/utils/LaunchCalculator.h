@@ -5,14 +5,17 @@
 #include <frc/geometry/Transform3d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/geometry/Twist2d.h>
+#include <array>
+#include <deque>
 #include <units/length.h>
-#include <units/velocity.h>
-#include <units/time.h>
 #include <units/angular_velocity.h>
+#include <units/time.h>
+#include <units/velocity.h>
 
 #include <map>
 #include <optional>
-#include <deque>
+
+#include "utils/NetworkTableMap.h"
 
 class LaunchCalculator {
  public:
@@ -61,10 +64,13 @@ class LaunchCalculator {
   void SetHoodAngleMap(const std::map<double, double>& hoodAngleMapDeg);
   void AdjustHoodAngleAtDistance(double distanceMeters, double deltaDeg);
 
+  void UpdateFromNetworkTables() const;
+  void PublishCurrentTable() const;
+  void SaveToFile() const;
+
  private:
   static double InterpolateFromMap(const std::map<double, double>& map, double key);
 
-  std::map<double, ShotPoint> m_shotTable;
   double m_minDistanceMeters = 1.0;
   double m_maxDistanceMeters = 7.0;
   double m_phaseDelaySec = 0.03;
@@ -75,4 +81,6 @@ class LaunchCalculator {
   std::optional<double> m_lastHoodAngleDeg;
   std::deque<double> m_turretVelocityWindow;
   std::deque<double> m_hoodVelocityWindow;
+
+  NetworkTableMap<double, double, double, double> m_ntMap;
 };

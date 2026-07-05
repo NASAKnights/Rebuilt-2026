@@ -14,6 +14,8 @@ Climber::Climber()
     m_PositionInchesLog = wpi::log::DoubleLogEntry(log, "/Climber/PositionInches");
     m_StateLog = wpi::log::IntegerLogEntry(log, "/Climber/State");
     m_LimitSwitchLog = wpi::log::BooleanLogEntry(log, "/Climber/LimitSwitch");
+    m_MotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Climber/MotorCurrent");
+    m_MotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Climber/MotorVoltage");
 
     ctre::phoenix6::configs::TalonFXConfiguration climbConfig;
     ctre::phoenix6::configs::CurrentLimitsConfigs climbCurrentConfig;
@@ -44,6 +46,8 @@ void Climber::Periodic() {
   m_PositionInchesLog.Append(GetPositionInches().value());
   m_StateLog.Append(m_ClimberState);
   m_LimitSwitchLog.Append(atBottom);
+  m_MotorCurrentLog.Append(climberMotor1.GetSupplyCurrent().GetValue().value());
+  m_MotorVoltageLog.Append(climberMotor1.GetMotorVoltage().GetValue().value());
 }
 
 void Climber::moveMotor() {

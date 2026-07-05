@@ -34,6 +34,8 @@
 #include <frc/Timer.h>
 #include <frc/RobotBase.h>
 #include <rev/SparkSim.h>
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 
 namespace Turret_ShooterConstants {
@@ -160,6 +162,15 @@ private:
   units::turn_t m_spindexerSimPosition{0_tr};
   units::turns_per_second_t m_spindexerSimVelocity{0_tps};
   units::turns_per_second_t m_spindexerTargetVelocity{0_tps};
+
+  wpi::log::DoubleLogEntry m_LeftMotorCurrentLog;
+  wpi::log::DoubleLogEntry m_LeftMotorVoltageLog;
+  wpi::log::DoubleLogEntry m_RightMotorCurrentLog;
+  wpi::log::DoubleLogEntry m_RightMotorVoltageLog;
+  wpi::log::DoubleLogEntry m_SpindexerMotorCurrentLog;
+  wpi::log::DoubleLogEntry m_SpindexerMotorVoltageLog;
+  wpi::log::DoubleLogEntry m_IndexerMotorCurrentLog;
+  wpi::log::DoubleLogEntry m_IndexerMotorVoltageLog;
 
   frc::DCMotor m_indexerSimMotor = frc::DCMotor::NEO(1);
   rev::spark::SparkSim m_indexerSparkSim{&m_indexerMotor, &m_indexerSimMotor};

@@ -11,6 +11,8 @@
 #include <ctre/phoenix6/configs/Configurator.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
 #include <ctre/phoenix6/configs/Configuration.hpp>
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 class TurretIntake : public frc2::SubsystemBase
 {
@@ -30,6 +32,8 @@ private:
   // ctre::phoenix::motorcontrol::can::VictorSPX m_intakeMotor{8};
   // rev::spark::SparkMax m_intakeMotor{8, rev::spark::SparkLowLevel::MotorType::kBrushless};
   ctre::phoenix6::hardware::TalonFX m_intakeMotor{8};
+  wpi::log::DoubleLogEntry m_MotorCurrentLog;
+  wpi::log::DoubleLogEntry m_MotorVoltageLog;
   
 
   // Components (e.g. motor controllers and sensors) should generally be

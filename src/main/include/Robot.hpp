@@ -3,7 +3,6 @@
 #pragma once
 
 #include <optional>
-#include <fstream>
 
 #include "frc/DataLogManager.h"
 #include "wpi/DataLog.h"
@@ -75,7 +74,6 @@ public:
     void SimulationPeriodic() override;
 
     std::string CheckActiveHub();
-    void LoadCSVToMap(const std::string& filename);
 
 private:
     // Have it empty by default so that if testing teleop it
@@ -113,7 +111,6 @@ private:
 
     std::string targetKey = "POI/Calibration POIs";
     std::string prevAuto = "";
-    std::string csvName = "/home/lvuser/data.csv";
 
     frc::PowerDistribution m_pdh =
         frc::PowerDistribution{1, frc::PowerDistribution::ModuleType::kRev};
@@ -145,8 +142,6 @@ private:
 
     frc2::CommandPtr autoWheelOffsetsCommand = AutoWheelOffsets(&m_swerveDrive).ToPtr().IgnoringDisable(true);
 
-    bool firstBoot = true;
-    
     // Robot Container methods
     void CreateRobot();
     void BindCommands();

@@ -2,6 +2,9 @@
 
 #include "Robot.hpp"
 
+#include <exception>
+
+#include <frc/Errors.h>
 
 Robot::Robot() : networkTableInst(nt::NetworkTableInstance::GetDefault())
 {
@@ -27,7 +30,18 @@ void Robot::RobotInit()
     frc::SmartDashboard::PutData("Set", autoWheelOffsetsCommand.get());
     frc::SmartDashboard::PutNumber("hoodAngle", 1.0);
     
-    autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
+    try
+    {
+        autoChooser = pathplanner::AutoBuilder::buildAutoChooser();
+    }
+    catch (const std::exception& e)
+    {
+        FRC_ReportWarning("Failed to load PathPlanner autos: {}", e.what());
+    }
+    catch (...)
+    {
+        FRC_ReportWarning("Failed to load PathPlanner autos: unknown error");
+    }
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
     
@@ -106,25 +120,9 @@ void Robot::DisabledInit()
         m_swerveDrive.ResetDriveEncoders();
     }
 
-    auto turretMap = m_turret.GetCurrentMapState();
-    auto hoodMap = m_turret.m_turret_shooter.GetCurrentMapState();
-
-    frc::SmartDashboard::PutBoolean("HELP/", firstBoot);
-    if(!firstBoot){
-        std::ofstream writeFile(csvName);
-
-        for (const auto& [distance, speed] : turretMap)
-        {
-            double hood = hoodMap[distance];
-            writeFile << distance << "," << speed << "," << hood << "\n";
-        }
-        writeFile.close();
-    }
-    else {
-        LoadCSVToMap(csvName);
-    }
+    m_turret.SaveLaunchMapToFile();
+    m_turret.PublishLaunchMap();
     m_led.DefaultAnimation();
-    firstBoot = false;
 }
 
 void Robot::SetAutonomousCommand(std::string a)
@@ -559,6 +557,7 @@ void Robot::BindCommands()
 
 void Robot::DisabledPeriodic()
 {
+    m_turret.PublishLaunchMap();
     std::string poiName = std::string("POI/") + frc::SmartDashboard::GetString("POIName", "");
     frc::SmartDashboard::PutBoolean("IsPersist", frc::SmartDashboard::IsPersistent(poiName));
 }
@@ -656,56 +655,6 @@ std::string Robot::CheckActiveHub()
         }
         
     } 
-}
-
-void Robot::LoadCSVToMap(const std::string& filename) {
-    if(!std::filesystem::exists(filename))
-    {
-        std::ofstream createFile(filename);
-
-        createFile <<
-        "1.0,5,70\n"
-        "1.5,10,68\n"
-        "2.0,50,65\n"
-        "2.5,70,60\n"
-        "3.0,100,55\n"
-        "3.5,105,53\n"
-        "4.0,110,50\n"
-        "4.5,115,48\n"
-        "5.0,120,45\n"
-        "5.5,120,43\n"
-        "6.0,120,40\n"
-        "6.5,120,38\n"
-        "7.0,120,35\n";
-
-        createFile.close();
-    }
-    
-    std::ifstream file(filename);
-
-    std::string line;
-
-    std::map<double, double> hoodAngleMap, flyWheelSpeedMap;
-    
-    // while (std::getline(file, line)) {
-    //     std::stringstream ss(line);
-    //     std::string distance, flywheelSpeed, hoodAngle;
-        
-    //     std::getline(ss, distance, ',');
-    //     std::getline(ss, flywheelSpeed, ',');
-    //     std::getline(ss, hoodAngle, ',');
-        
-    //     double key = std::stod(distance);
-    //     double flyWheelvalue = std::stod(flywheelSpeed);
-    //     double hoodValue = std::stod(hoodAngle);
-        
-    //     flyWheelSpeedMap.insert({key, flyWheelvalue});
-    //     hoodAngleMap.insert({key, hoodValue});
-    // }
-    
-    // m_turret.m_turret_shooter.SetCurrentMapState(hoodAngleMap);
-    // m_turret.SetCurrentMapState(flyWheelSpeedMap);
-    // file.close();
 }
 
 

@@ -12,6 +12,7 @@
 #include <frc/RobotBase.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <string>
 #include <units/angle.h>
 #include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
@@ -33,6 +34,13 @@ SwerveModule::SwerveModule(int driveMotorID, int steerMotorID,
       m_angleOffset{angleOffset},
       m_driveSim("TalonFX", driveMotorID), m_steerSim("TalonFX", steerMotorID)
 {
+  wpi::log::DataLog& log = frc::DataLogManager::GetLog();
+  const std::string basePath = "/Swerve/Module" + std::to_string(m_id);
+  m_driveMotorCurrentLog = wpi::log::DoubleLogEntry(log, basePath + "/DriveMotorCurrent");
+  m_driveMotorVoltageLog = wpi::log::DoubleLogEntry(log, basePath + "/DriveMotorVoltage");
+  m_steerMotorCurrentLog = wpi::log::DoubleLogEntry(log, basePath + "/SteerMotorCurrent");
+  m_steerMotorVoltageLog = wpi::log::DoubleLogEntry(log, basePath + "/SteerMotorVoltage");
+
   m_driveSimVelocity = m_driveSim.GetDouble("Velocity");
   m_driveSimPosition = m_driveSim.GetDouble("Position");
   m_steerSimPosition = m_steerSim.GetDouble("Position");
@@ -124,6 +132,10 @@ void SwerveModule::Periodic()
   frc::SmartDashboard::PutNumber(
       "Module " + std::to_string(m_id) + "/" + " Rotations",
       (m_driveMotor.GetPosition()).GetValue().value());
+  m_driveMotorCurrentLog.Append(m_driveMotor.GetSupplyCurrent().GetValue().value());
+  m_driveMotorVoltageLog.Append(m_driveMotor.GetMotorVoltage().GetValue().value());
+  m_steerMotorCurrentLog.Append(m_steerMotor.GetSupplyCurrent().GetValue().value());
+  m_steerMotorVoltageLog.Append(m_steerMotor.GetMotorVoltage().GetValue().value());
 }
 
 void SwerveModule::SimulationPeriodic()

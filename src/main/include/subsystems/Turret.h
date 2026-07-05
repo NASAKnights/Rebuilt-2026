@@ -195,6 +195,14 @@ public:
 
   std::map<double, double> GetCurrentMapState();
   void ChangeHoodMapValue(double newValue);
+  void SaveLaunchMapToFile() const
+  {
+    m_launchCalculator.SaveToFile();
+  }
+  void PublishLaunchMap() const
+  {
+    m_launchCalculator.PublishCurrentTable();
+  }
 
   void SetCurrentMapState(std::map<double, double> inputCurrentState);
   std::vector<double> manualShootingPresetMid();
@@ -295,11 +303,11 @@ private:
   frc::Servo m_hood2{8};
   
   frc::ArmFeedforward m_feedforward;
-  wpi::log::DoubleLogEntry m_AngleLog;
-  wpi::log::DoubleLogEntry m_SetPointLog;
-  wpi::log::IntegerLogEntry m_StateLog;
-  wpi::log::DoubleLogEntry m_MotorCurrentLog;
-  wpi::log::DoubleLogEntry m_MotorVoltageLog;
+    wpi::log::DoubleLogEntry m_AngleLog;
+    wpi::log::DoubleLogEntry m_SetPointLog;
+    wpi::log::IntegerLogEntry m_StateLog;
+    wpi::log::DoubleLogEntry m_MotorCurrentLog;
+    wpi::log::DoubleLogEntry m_MotorVoltageLog;
   frc::Timer *m_timer;
   float Turret_Angle;
   std::pair<units::degree_t, units::degrees_per_second_t> findTrackingAngle();
