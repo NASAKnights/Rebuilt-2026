@@ -132,6 +132,8 @@ namespace TurretConstants
   // value.  kminAngle should therefore be set based on the physical location of the
   // limit switch, such that 0 deg will point the turret directly away from the intake, 
   // orthogonal to the robot. 
+  const units::angle::radian_t ksoftMinAngle = 15_deg;
+  const units::angle::radian_t ksoftMaxAngle = 320_deg;
   const units::angle::radian_t kminAngle = 35_deg; //Needs to increase to fix skew to the right
   const units::angle::radian_t kmaxAngle = 275_deg;
   const units::angle::radian_t kmidPoint = (kmaxAngle - kminAngle)/2.0 + kminAngle;

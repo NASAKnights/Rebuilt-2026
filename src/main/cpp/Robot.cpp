@@ -267,7 +267,7 @@ void Robot::CreateRobot()
     m_swerveDrive.SetDefaultCommand(frc2::RunCommand(
         [this]
         {
-            auto controllerIn = m_driverController.GetRawButton(5);
+            auto controllerIn = m_driverController.GetRawButton(4);
             // bool approach = 0;
 
             auto leftXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(1),
@@ -282,9 +282,9 @@ void Robot::CreateRobot()
             if (controllerIn)
                 // Robot-Oriented Drive
                 m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                    -leftXAxis * DriveConstants::kMaxTranslationalVelocity,
-                    -leftYAxis * DriveConstants::kMaxTranslationalVelocity,
-                    -rightXAxis * DriveConstants::kMaxRotationalVelocity, frc::Rotation2d()));
+                    -leftXAxis * 1.0_mps,
+                    -leftYAxis * 1.0_mps,
+                    -rightXAxis * 2.0_rad_per_s, m_swerveDrive.GetHeading()));
             else
             {
                 m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(

@@ -289,20 +289,20 @@ std::pair<units::degree_t, units::degrees_per_second_t> Turret::findTrackingAngl
     units::radian_t error = frc::AngleModulus(turret_angle - GetMeasurement());
 
     // If the computed target exceeds the upper limit by >180°, it likely wrapped
-    if (turret_angle > TurretConstants::kmaxAngle)
+    if (turret_angle > TurretConstants::ksoftMaxAngle)
     {
         // If we're only just beyond by less than 180°, clamp
-        if (turret_angle - 360_deg >= TurretConstants::kminAngle)
+        if (turret_angle - 360_deg >= TurretConstants::ksoftMinAngle)
             turret_angle -= 360_deg;
         else
-            turret_angle = TurretConstants::kmaxAngle;
+            turret_angle = TurretConstants::ksoftMaxAngle;
     }
-    else if (turret_angle < TurretConstants::kminAngle)
+    else if (turret_angle < TurretConstants::ksoftMinAngle)
     {
-        if (turret_angle + 360_deg <= TurretConstants::kmaxAngle)
+        if (turret_angle + 360_deg <= TurretConstants::ksoftMaxAngle)
             turret_angle += 360_deg;
         else
-            turret_angle = TurretConstants::kminAngle;
+            turret_angle = TurretConstants::ksoftMinAngle;
     }
     frc::SmartDashboard::PutNumber("/Turret/Aim/Turret Angle Error Deg", units::degree_t{error}.value());
 
@@ -560,26 +560,28 @@ void Turret::Periodic()
         frc::SmartDashboard::PutNumber("/Turret/Comp/TurretAngleCorrectedDeg", correctedAngle.value());
         frc::SmartDashboard::PutNumber("/Turret/Aim/Feedforward", ff.value());
 
-        if (GetMeasurement() < TurretConstants::kminAngle && v.value() < 0)
+        if (GetMeasurement() < TurretConstants::ksoftMinAngle && v.value() < 0)
         {
             frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "soft_min");
             v = units::volt_t(0);
         }
-        else if (GetMeasurement() > TurretConstants::kmaxAngle && v.value() > 0)
+        else if (GetMeasurement() > TurretConstants::ksoftMaxAngle && v.value() > 0)
         {
             frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "soft_max");
             v = units::volt_t(0);
         }
-        else if (!m_magSwitch.Get() && GetMeasurement().value() < TurretConstants::kmidPoint.convert<units::deg>().value() && v.value() < 0)
-        {
-            frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "min");
-            v = units::volt_t(0);
-        }
-        else if (!m_magSwitch.Get() && GetMeasurement().value() > TurretConstants::kmidPoint.convert<units::deg>().value() && v.value() > 0)
-        {
-            frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "max");
-            v = units::volt_t(0);
-        }
+        // else if (!m_magSwitch.Get() && GetMeasurement().value() < TurretConstants::kmidPoint.convert<units::deg>().value() && v.value() < 0)
+        // {
+        //     frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "min");
+        //     v = units::volt_t(0);
+        // }
+        // else if (!m_magSwitch.Get() && GetMeasurement().value() > TurretConstants::kmidPoint.convert<units::deg>().value() && v.value() > 0)
+        // {
+        //     frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "max");
+        //     v = units::volt_t(0);
+        // }
+
+
         // else if (!m_magSwitch.Get() && GetMeasurement().value() < TurretConstants::kmidPoint.convert<units::deg>().value())
         // {
         //     frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "min");
@@ -862,17 +864,17 @@ std::map<double, double> Turret::GetCurrentMapState()
 
 std::vector<double> Turret::manualShootingPresetMid()
 {
-    return std::vector<double>{46.5, 62.5, 180.0};
+    return std::vector<double>{25.5, 58.5, 180.0};
 }
 
 std::vector<double> Turret::manualShootingPresetLeft()
 {
-    return std::vector<double>{55.0, 55.0, 272.0};
+    return std::vector<double>{40.0, 55.0, 272.0};
 }
 
 std::vector<double> Turret::manualShootingPresetRight()
 {
-    return std::vector<double>{57.0, 52.0, 90.0};
+    return std::vector<double>{40.0, 52.0, 90.0};
 }
 
 void Turret::PresetShooting(bool temp, std::string preset)
