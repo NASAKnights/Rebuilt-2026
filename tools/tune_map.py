@@ -16,8 +16,9 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from PySide6.QtCore import QSignalBlocker, Qt, QTimer
-    from PySide6.QtGui import QAction
+    from PySide6.QtCharts import QChart, QChartView, QLineSeries, QScatterSeries, QValueAxis
+    from PySide6.QtCore import QPointF, QSignalBlocker, Qt, QTimer
+    from PySide6.QtGui import QAction, QColor, QPainter, QPen
     from PySide6.QtWidgets import (
         QApplication,
         QAbstractItemView,
@@ -51,6 +52,16 @@ LOCAL_CSV_DIR = os.path.join(REPO_ROOT, "src", "main", "deploy")
 SETTINGS_PATH = os.path.join(os.path.dirname(__file__), ".tune_map_qt_settings.json")
 FALLBACK_SERVER = "127.0.0.1"
 FALLBACK_NT_PATH = "LaunchCalculator/Points"
+CHART_COLORS = [
+    "#6ea0ff",
+    "#48d17a",
+    "#f3c64e",
+    "#ff7a70",
+    "#b18cff",
+    "#38c7d8",
+    "#ff9f43",
+    "#a3e635",
+]
 
 
 class CellDelegateState:
@@ -92,6 +103,226 @@ class AddRowDialog(QDialog):
         return distance, values
 
 
+class MapChartView(QChartView):
+    def __init__(self, chart_window):
+        super().__init__()
+        self.chart_window = chart_window
+        self.setMouseTracking(True)
+        self.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+    def mouseMoveEvent(self, event):
+        self.chart_window.update_hover_readout(self.mapToScene(event.position().toPoint()))
+        super().mouseMoveEvent(event)
+
+    def leaveEvent(self, event):
+        self.chart_window.clear_hover_readout()
+        super().leaveEvent(event)
+
+
+class MapChartWindow(QDialog):
+    def __init__(self, tuner_window):
+        super().__init__(tuner_window)
+        self.tuner_window = tuner_window
+        self.setWindowTitle("Map Visualization")
+        self.resize(920, 560)
+        self.series_checks = {}
+        self.last_series_names = []
+        self.visible_points = {}
+
+        root_layout = QVBoxLayout(self)
+        root_layout.setContentsMargins(12, 12, 12, 12)
+        root_layout.setSpacing(10)
+
+        top_layout = QHBoxLayout()
+        top_layout.addWidget(QLabel("Series"))
+        self.series_toggle_layout = QHBoxLayout()
+        self.series_toggle_layout.setSpacing(8)
+        top_layout.addLayout(self.series_toggle_layout)
+        top_layout.addStretch(1)
+
+        self.refresh_button = QPushButton("Refresh")
+        self.refresh_button.clicked.connect(self.refresh)
+        top_layout.addWidget(self.refresh_button)
+        root_layout.addLayout(top_layout)
+
+        self.chart = QChart()
+        self.chart.setBackgroundBrush(QColor("#151922"))
+        self.chart.setPlotAreaBackgroundBrush(QColor("#10131a"))
+        self.chart.setPlotAreaBackgroundVisible(True)
+        self.chart.legend().setVisible(True)
+        self.chart.legend().setLabelColor(QColor("#e6e8ee"))
+
+        self.chart_view = MapChartView(self)
+        self.chart_view.setChart(self.chart)
+        root_layout.addWidget(self.chart_view, 1)
+
+        self.hover_label = QLabel("Move over the chart to inspect interpolated values.")
+        self.hover_label.setObjectName("Detail")
+        root_layout.addWidget(self.hover_label)
+
+    def refresh(self):
+        data = self.tuner_window.numeric_chart_data()
+        series = data.get("series", [])
+        series_names = [item["name"] for item in series]
+        if series_names != self.last_series_names:
+            self.rebuild_series_toggles(series_names)
+
+        self.chart.removeAllSeries()
+        for axis in self.chart.axes():
+            self.chart.removeAxis(axis)
+        self.visible_points = {}
+
+        selected_series = [
+            item for item in series
+            if self.series_checks.get(item["name"]) and self.series_checks[item["name"]].isChecked()
+        ]
+        if not selected_series:
+            self.configure_empty_chart(data.get("key_name", "Distance"), "Value")
+            self.hover_label.setText("Select at least one series to visualize.")
+            return
+
+        x_values = [point[0] for item in selected_series for point in item["points"]]
+        y_values = [point[1] for item in selected_series for point in item["points"]]
+        if not x_values or not y_values:
+            self.configure_empty_chart(data.get("key_name", "Distance"), "Value")
+            self.hover_label.setText("No numeric map points are available.")
+            return
+
+        axis_x = self.value_axis(data.get("key_name", "Distance"), min(x_values), max(x_values))
+        axis_y = self.value_axis("Value", min(y_values), max(y_values))
+        self.chart.addAxis(axis_x, Qt.AlignmentFlag.AlignBottom)
+        self.chart.addAxis(axis_y, Qt.AlignmentFlag.AlignLeft)
+
+        for index, item in enumerate(selected_series):
+            color = QColor(CHART_COLORS[index % len(CHART_COLORS)])
+            points = item["points"]
+            self.visible_points[item["name"]] = points
+
+            line_series = QLineSeries()
+            line_series.setName(item["name"])
+            line_series.setPen(QPen(color, 2))
+            for x_value, y_value in points:
+                line_series.append(QPointF(x_value, y_value))
+            self.chart.addSeries(line_series)
+            line_series.attachAxis(axis_x)
+            line_series.attachAxis(axis_y)
+
+            point_series = QScatterSeries()
+            point_series.setName(f"{item['name']} points")
+            point_series.setColor(color)
+            point_series.setBorderColor(QColor("#f3f5f8"))
+            point_series.setMarkerSize(9.0)
+            for x_value, y_value in points:
+                point_series.append(QPointF(x_value, y_value))
+            point_series.hovered.connect(
+                lambda point, state, name=item["name"]: self.update_point_hover(name, point, state)
+            )
+            self.chart.addSeries(point_series)
+            point_series.attachAxis(axis_x)
+            point_series.attachAxis(axis_y)
+
+        self.hover_label.setText("Move over the chart to inspect interpolated values.")
+
+    def rebuild_series_toggles(self, series_names):
+        existing_state = {
+            name: checkbox.isChecked()
+            for name, checkbox in self.series_checks.items()
+        }
+        while self.series_toggle_layout.count():
+            item = self.series_toggle_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+
+        self.series_checks = {}
+        self.last_series_names = list(series_names)
+        for name in series_names:
+            checkbox = QCheckBox(name)
+            checkbox.setChecked(existing_state.get(name, True))
+            checkbox.stateChanged.connect(lambda _state: self.refresh())
+            self.series_checks[name] = checkbox
+            self.series_toggle_layout.addWidget(checkbox)
+
+    def configure_empty_chart(self, x_title, y_title):
+        self.chart.removeAllSeries()
+        for axis in self.chart.axes():
+            self.chart.removeAxis(axis)
+        axis_x = self.value_axis(x_title, 0.0, 1.0)
+        axis_y = self.value_axis(y_title, 0.0, 1.0)
+        self.chart.addAxis(axis_x, Qt.AlignmentFlag.AlignBottom)
+        self.chart.addAxis(axis_y, Qt.AlignmentFlag.AlignLeft)
+
+    def value_axis(self, title, minimum, maximum):
+        axis = QValueAxis()
+        axis.setTitleText(title)
+        axis.setLabelsColor(QColor("#d9dee8"))
+        axis.setTitleBrush(QColor("#e6e8ee"))
+        axis.setGridLineColor(QColor("#303848"))
+        low, high = self.padded_range(minimum, maximum)
+        axis.setRange(low, high)
+        axis.setTickCount(6)
+        return axis
+
+    def padded_range(self, minimum, maximum):
+        if not math.isfinite(minimum) or not math.isfinite(maximum):
+            return 0.0, 1.0
+        if minimum == maximum:
+            pad = max(abs(minimum) * 0.1, 1.0)
+            return minimum - pad, maximum + pad
+        pad = (maximum - minimum) * 0.08
+        return minimum - pad, maximum + pad
+
+    def update_hover_readout(self, chart_position):
+        if not self.visible_points:
+            return
+        plot_area = self.chart.plotArea()
+        if not plot_area.contains(chart_position):
+            self.clear_hover_readout()
+            return
+
+        value_point = self.chart.mapToValue(chart_position)
+        x_value = value_point.x()
+        parts = [f"{self.tuner_window.key_column_name} {x_value:.3f}"]
+        for name, points in self.visible_points.items():
+            evaluated = self.interpolate(points, x_value)
+            nearest = self.nearest_point(points, x_value)
+            if evaluated is None or nearest is None:
+                continue
+            parts.append(
+                f"{name}: eval {evaluated:.3f}, nearest ({nearest[0]:.3f}, {nearest[1]:.3f})"
+            )
+        self.hover_label.setText(" | ".join(parts))
+
+    def update_point_hover(self, name, point, state):
+        if state:
+            self.hover_label.setText(f"{name} point: ({point.x():.3f}, {point.y():.3f})")
+
+    def clear_hover_readout(self):
+        self.hover_label.setText("Move over the chart to inspect interpolated values.")
+
+    def interpolate(self, points, x_value):
+        if not points:
+            return None
+        if x_value <= points[0][0]:
+            return points[0][1]
+        if x_value >= points[-1][0]:
+            return points[-1][1]
+        for index in range(1, len(points)):
+            left_x, left_y = points[index - 1]
+            right_x, right_y = points[index]
+            if left_x <= x_value <= right_x:
+                if right_x == left_x:
+                    return right_y
+                t = (x_value - left_x) / (right_x - left_x)
+                return left_y + (right_y - left_y) * t
+        return points[-1][1]
+
+    def nearest_point(self, points, x_value):
+        if not points:
+            return None
+        return min(points, key=lambda point: abs(point[0] - x_value))
+
+
 class MapTunerWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -108,6 +339,7 @@ class MapTunerWindow(QMainWindow):
         self.param_names = []
         self.column_specs = []
         self.publishers = {}
+        self.chart_window = None
         self.state = CellDelegateState()
         self.csv_dir = self.settings.get("csv_dir", os.path.dirname(self.settings.get("csv_path", os.path.join(LOCAL_CSV_DIR, "Points.csv"))))
         self.local_csv_path = self.derived_csv_path(self.nt_path)
@@ -275,6 +507,9 @@ class MapTunerWindow(QMainWindow):
         self.sync_button = QPushButton("Publish Now")
         self.sync_button.clicked.connect(self.publish_now)
         self.sync_button.setEnabled(False)
+        self.visualize_button = QPushButton("Visualize")
+        self.visualize_button.clicked.connect(self.open_chart_window)
+        self.visualize_button.setEnabled(False)
         self.restore_backup_button = QPushButton("Restore Backup")
         self.restore_backup_button.clicked.connect(self.restore_backup)
 
@@ -304,6 +539,7 @@ class MapTunerWindow(QMainWindow):
         toolbar.addWidget(self.add_row_button)
         toolbar.addWidget(self.delete_row_button)
         toolbar.addWidget(self.sync_button)
+        toolbar.addWidget(self.visualize_button)
         toolbar.addWidget(self.restore_backup_button)
         toolbar.addWidget(QLabel("Nudge"))
         toolbar.addWidget(self.nudge_decrease_button)
@@ -534,6 +770,7 @@ class MapTunerWindow(QMainWindow):
         self.add_row_button.setEnabled(enabled)
         self.delete_row_button.setEnabled(enabled)
         self.sync_button.setEnabled(enabled)
+        self.visualize_button.setEnabled(enabled and self.supports_numeric_table())
         self.nudge_decrease_button.setEnabled(enabled)
         self.nudge_increase_button.setEnabled(enabled)
         self.auto_publish_checkbox.setEnabled(enabled)
@@ -598,6 +835,7 @@ class MapTunerWindow(QMainWindow):
         self.state.loading = False
         self.state.invalid_cells.clear()
         self.update_invalid_state()
+        self.refresh_chart_window()
 
     def load_from_nt(self):
         self.state.loading = True
@@ -626,6 +864,7 @@ class MapTunerWindow(QMainWindow):
             self.set_status("No map rows", "Warn")
             self.detail_label.setText(f"No rows found under {self.nt_path} or {self.local_csv_path}.")
             self.update_invalid_state()
+            self.refresh_chart_window()
             return False
 
         self.row_key_kind = self.infer_row_key_kind(row_keys)
@@ -673,6 +912,7 @@ class MapTunerWindow(QMainWindow):
         self.state.dirty = False
         self.state.invalid_cells.clear()
         self.update_invalid_state()
+        self.refresh_chart_window()
 
         if loaded:
             self.save_local_csv()
@@ -879,6 +1119,7 @@ class MapTunerWindow(QMainWindow):
         self.sort_rows()
         self.state.dirty = True
         self.publish_now(show_success=False)
+        self.refresh_chart_window()
 
     def delete_selected_rows(self):
         selected = sorted({index.row() for index in self.table.selectedIndexes()}, reverse=True)
@@ -888,6 +1129,8 @@ class MapTunerWindow(QMainWindow):
             self.table.removeRow(row)
         self.state.dirty = True
         self.publish_now(show_success=False)
+        self.update_invalid_state()
+        self.refresh_chart_window()
         self.detail_label.setText(f"Deleted {len(selected)} row(s).")
 
     def current_increment(self, default=None):
@@ -941,6 +1184,7 @@ class MapTunerWindow(QMainWindow):
         if column == 0:
             self.sort_rows()
         self.publish_now(show_success=False)
+        self.refresh_chart_window()
 
     def next_distance(self):
         distances = []
@@ -956,6 +1200,7 @@ class MapTunerWindow(QMainWindow):
         self.decimals_decrease_button.setEnabled(self.decimals_value > 0)
         self.decimals_increase_button.setEnabled(self.decimals_value < 4)
         self.reformat_table()
+        self.refresh_chart_window()
 
     def reformat_table(self):
         if self.state.loading:
@@ -973,14 +1218,56 @@ class MapTunerWindow(QMainWindow):
 
     def update_invalid_state(self):
         invalid = bool(self.state.invalid_cells)
-        self.sync_button.setEnabled(self.connected and not invalid)
         numeric_table = self.supports_numeric_table()
+        self.sync_button.setEnabled(self.connected and not invalid)
         self.nudge_decrease_button.setEnabled(self.connected and not invalid and numeric_table)
         self.nudge_increase_button.setEnabled(self.connected and not invalid and numeric_table)
         self.auto_publish_checkbox.setEnabled(self.connected and not invalid)
         self.add_row_button.setEnabled(self.connected and numeric_table)
+        self.visualize_button.setEnabled(numeric_table and self.table.rowCount() > 0)
         if invalid:
             self.detail_label.setText("Fix highlighted cells before publishing.")
+
+    def open_chart_window(self):
+        if not self.supports_numeric_table() or self.table.rowCount() == 0:
+            QMessageBox.information(self, "No Numeric Map", "Load or create a numeric map before visualizing it.")
+            return
+        if self.chart_window is None:
+            self.chart_window = MapChartWindow(self)
+        self.chart_window.refresh()
+        self.chart_window.show()
+        self.chart_window.raise_()
+        self.chart_window.activateWindow()
+
+    def refresh_chart_window(self):
+        if self.chart_window and self.chart_window.isVisible():
+            self.chart_window.refresh()
+
+    def numeric_chart_data(self):
+        if not self.supports_numeric_table():
+            return {"key_name": self.key_column_name, "series": []}
+
+        rows = []
+        for row in range(self.table.rowCount()):
+            x_value = self.coerce_numeric_value(self.cell_value(row, 0))
+            row_values = []
+            for column, spec in enumerate(self.column_specs, start=1):
+                if spec["kind"] not in {"double", "int"}:
+                    continue
+                row_values.append((spec["name"], self.coerce_numeric_value(self.cell_value(row, column))))
+            rows.append((x_value, row_values))
+        rows.sort(key=lambda item: item[0])
+
+        series = []
+        for column_index, spec in enumerate(self.column_specs):
+            if spec["kind"] not in {"double", "int"}:
+                continue
+            points = []
+            for x_value, row_values in rows:
+                if column_index < len(row_values):
+                    points.append((x_value, row_values[column_index][1]))
+            series.append({"name": spec["name"], "points": points})
+        return {"key_name": self.key_column_name, "series": series}
 
     def supports_numeric_table(self):
         if not self.column_specs or self.row_key_kind not in {"double", "int"}:

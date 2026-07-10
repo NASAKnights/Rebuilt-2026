@@ -295,6 +295,8 @@ void Turret_Shooter::Periodic()
 {
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Left Motor Voltage", m_leftMotor.GetMotorVoltage().GetValue().value());
     frc::SmartDashboard::PutNumber("/Turret/Shooter/Right Motor Voltage", m_rightMotor.GetMotorVoltage().GetValue().value());
+    frc::SmartDashboard::PutNumber("/Turret/Shooter/Right Motor Temperature C", m_rightMotor.GetDeviceTemp().GetValueAsDouble());
+    frc::SmartDashboard::PutNumber("/Turret/Shooter/Left Motor Temperature C", m_rightMotor.GetDeviceTemp().GetValueAsDouble());
     m_LeftMotorCurrentLog.Append(m_leftMotor.GetSupplyCurrent().GetValue().value());
     m_LeftMotorVoltageLog.Append(m_leftMotor.GetMotorVoltage().GetValue().value());
     m_RightMotorCurrentLog.Append(m_rightMotor.GetSupplyCurrent().GetValue().value());
