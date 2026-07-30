@@ -34,25 +34,6 @@ void BetterHalfRaise::Execute() {
     }
     m_timer.Restart();
   }
-
-  // if ((time == units::time::second_t{1} || time == units::time::second_t{3}) && !raise)
-  // {
-  //   raise = true;
-  // }
-  // else if (time == units::time::second_t{2} && raise)
-  // {
-  //   raise = false;
-  // }
-
-  // if (raise)
-  // {
-  //   m_wrist->SetAngle(35.0);
-  // }
-  // else if (!raise)
-  // {
-    
-  // }
-  
   
 }
 

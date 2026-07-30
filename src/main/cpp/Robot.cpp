@@ -87,20 +87,12 @@ void Robot::RobotPeriodic()
                                         0.45_m,
                                         frc::Rotation3d(0.0_rad, 0.0_rad, units::radian_t{m_turret.GetMeasurement()}));
 
-    // frc::Pose3d ShooterPose3D = frc::Pose3d(pose.X()-0.18_m,
-    //                                     pose.Y()+0.18_m,
-    //                                     0.45_m,
-    //                                     frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad));
 
     frc::Pose3d HoodPose3D = frc::Pose3d(units::meter_t{ 1 * TurretConstants::kHoodXOffset *(std::cos(double(m_turret.GetMeasurement()) - 90))},
                                         units::meter_t{ 1 * TurretConstants::kHoodXOffset *(std::sin(double(m_turret.GetMeasurement()) - 90))},
                                         0.545_m,
                                         frc::Rotation3d(0.0_rad, units::radian_t{((90 - m_turret.GetHoodAngle())*3.14159)/180} , units::radian_t{m_turret.GetMeasurement()}));
 
-    // frc::Pose3d HoodPose3D = frc::Pose3d(ShooterPose3D.X() + units::meter_t{TurretConstants::kHoodXOffset *(std::cos(0.0))},
-    //                                     ShooterPose3D.Y() + units::meter_t{TurretConstants::kHoodYOffset *(std::sin(0.0))},
-    //                                     0.545_m,
-    //                                     frc::Rotation3d(0.0_rad, units::radian_t{((90 - m_turret.GetHoodAngle())*3.14159)/180} , 0.0_rad));
 
     std::vector<frc::Pose3d> modelPoses = {
         ShooterPose3D,
@@ -252,17 +244,6 @@ void Robot::CreateRobot()
     pathplanner::NamedCommands::registerCommand("Shoot", Shoot(&m_turret, true).ToPtr());
     pathplanner::NamedCommands::registerCommand("NoShoot", Shoot(&m_turret, false).ToPtr());
     pathplanner::NamedCommands::registerCommand("BetterHalfRaise", BetterHalfRaise(&m_intake, &m_wrist).ToPtr());
-    // pathplanner::NamedCommands::registerCommand("ExtendClimb", Climb(&m_climber, true).ToPtr());
-    // pathplanner::NamedCommands::registerCommand("RetractClimb", Climb(&m_climber, false).ToPtr());
-
-    // pathplanner::NamedCommands::registerCommand("StopShoot", );
-
-    // pathplanner::EventTrigger("Intake").WhileTrue(std::move(Intake(&m_intake, &m_wrist).ToPtr()));
-    // pathplanner::EventTrigger("FlattenMoonKnight").WhileTrue(std::move(FlattenMoonKnight(&m_turret, &m_wrist).ToPtr()));
-    // pathplanner::EventTrigger("Shoot").WhileTrue(std::move(Shoot(&m_turret).ToPtr()));
-
-    // pathplanner::EventTrigger("ExtendClimb").WhileTrue(std::move(Climb(&m_climber, true).ToPtr()));
-    // pathplanner::EventTrigger("RetractClimb").WhileTrue(std::move(Climb(&m_climber, false).ToPtr()));
 
     m_swerveDrive.SetDefaultCommand(frc2::RunCommand(
         [this]
@@ -303,9 +284,6 @@ void Robot::CreateRobot()
     AddPeriodic([this]
                 { m_turret.Periodic(); },
                 5_ms, 1_ms);
-    // AddPeriodic([this]
-    //             { m_climber.Periodic(); },
-    //             20_ms, 2_ms);
 
     // Configure the button bindings
     BindCommands();
@@ -331,41 +309,7 @@ void Robot::BindCommands()
                                 { m_turret.FindLimitSwitch();
                                 return; })));
 
-    // frc2::JoystickButton(&m_driverController, 4)
-    //         .OnTrue(frc2::CommandPtr(
-    //             frc2::InstantCommand([this]
-    //                                 { m_wrist.SetAngle(90);
-    //                                 return; })));
-                                
-    
-    // frc2::JoystickButton(&m_operatorController, 5)
-    // .OnTrue(frc2::CommandPtr(
-    //             frc2::InstantCommand([this]
-    //                                 {m_swerveDrive.SetSlow();
-    //                                     return; })))
-    //         .OnFalse(frc2::CommandPtr(
-    //             frc2::InstantCommand([this]
-    //                                 { m_swerveDrive.SetFast();
-    //                                 return; })));
-    
-    
-
-    // frc2::JoystickButton(&m_driverController, 3)
-    //     .OnTrue(scoreClosest.get())
-    //     .OnFalse(frc2::CommandPtr(
-    //         frc2::InstantCommand([this]
-    //                              { return m_pathfind.Cancel(); })));
-
     // --------------OPERATOR BUTTONS--------------------------------
-
-    // frc2::JoystickButton(&m_operatorController,1)
-    //     .OnTrue(frc2::CommandPtr(
-        //         frc2::InstantCommand([this]
-        //                                     { double hoodAngle = 0.7;
-        //                                         return m_turret.ChangeHoodAngle(hoodAngle); }))) //0.004 is the smallest movement it can do
-        //     .OnFalse(frc2::CommandPtr(
-            //         frc2::InstantCommand([this]
-            //                                     { return m_turret.ChangeHoodAngle(0); })));
         
         frc2::JoystickButton(&m_operatorController, 1)
                 .OnTrue(frc2::CommandPtr(
@@ -452,11 +396,6 @@ void Robot::BindCommands()
                         frc2::CommandPtr(frc2::InstantCommand([this] {
                             m_swerveDrive.MakeX(false);
                         })));
-        
-        // frc2::POVButton(&m_operatorController, 0)
-        // .WhileTrue(Climb(&m_climber, true).ToPtr());
-        // frc2::POVButton(&m_operatorController, 180)
-        // .WhileTrue(Climb(&m_climber, false).ToPtr());
             
     frc2::JoystickButton(&m_operatorController, 4)
         .WhileTrue(frc2::CommandPtr(frc2::InstantCommand([this] { m_intake.Outtake(); })))
@@ -468,17 +407,6 @@ void Robot::BindCommands()
     .OnFalse(frc2::CommandPtr(
             frc2::InstantCommand([this]
                                     { return m_intake.StopIntake(); })));
-
-    // frc2::POVButton(&m_operatorController, 180)
-    //                 .OnTrue(
-    //                     frc2::CommandPtr(frc2::InstantCommand([this] {
-    //                         m_turret.PresetShooting(true,"middle");
-    //                     })))
-    //                 .OnFalse(
-    //                     frc2::CommandPtr(frc2::InstantCommand([this] {
-    //                         m_turret.PresetShooting(false,"middle");
-    //                     })));
-    
     
     frc::BooleanEvent downPOVBE = frc::BooleanEvent(
         &m_POVloop,
@@ -517,41 +445,6 @@ void Robot::BindCommands()
                         frc2::CommandPtr(frc2::InstantCommand([this] {
                             m_turret.PresetShooting(false,"left");
                         })));
-                
-
-    // frc2::POVButton(&m_operatorController, 180)
-    //                 .OnTrue(
-    //                     frc2::CommandPtr(frc2::InstantCommand([this] {
-    //                         return m_turret.ChangeHoodMapValue(-1.0);
-    //                     }))
-    //                 );
-
-    // frc2::POVButton(&m_operatorController, 90)
-    //                 .OnTrue(
-    //                     frc2::CommandPtr(frc2::InstantCommand([this] {
-    //                         return m_turret.m_turret_shooter.ChangeSpeedMapValue(5);
-    //                     }))
-    //                 );
-
-    // frc2::POVButton(&m_operatorController, 270)
-    //                 .OnTrue(
-    //                     frc2::CommandPtr(frc2::InstantCommand([this] {
-    //                         return m_turret.m_turret_shooter.ChangeSpeedMapValue(-5);
-    //                     }))
-    //                 );
-                    
-    // frc2::JoystickButton(&m_operatorController, 7)
-    //     .WhileTrue(frc2::CommandPtr(frc2::RunCommand([this] { m_climber.Zero(); })))
-    //     .OnFalse(frc2::CommandPtr(frc2::InstantCommand([this] { m_climber.stopMotor(); })));
-
-    // frc2::Trigger operatorRightTrigger([&m_operatorController]
-    // {
-    //     if (m_operatorController.GetRawAxis(3) > 0.05) return true;
-    //     /* code */   
-    //     else return false;
-    // });
-
-
     
 }
 
