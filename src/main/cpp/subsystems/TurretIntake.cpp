@@ -10,9 +10,6 @@ TurretIntake::TurretIntake()
     m_MotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Turret/Intake/MotorCurrent");
     m_MotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Turret/Intake/MotorVoltage");
 
-    // rev::spark::SparkMaxConfig config;
-    // config.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
-    // config.SmartCurrentLimit(30);
 
     ctre::phoenix6::configs::TalonFXConfiguration intakeConfig{};
     // m_intakeMotor.Configure(config, rev::spark::SparkMax::ResetMode::kResetSafeParameters, rev::spark::SparkMax::PersistMode::kPersistParameters);

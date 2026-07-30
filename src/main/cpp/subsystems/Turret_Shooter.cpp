@@ -51,12 +51,6 @@ Turret_Shooter::Turret_Shooter()
     frc::SmartDashboard::PutBoolean("/Turret/Shooter/Left Motor Status", false);
     frc::SmartDashboard::PutBoolean("/Turret/Shooter/Right Motor Status", false);
 
-    // while (!leftStatus.IsOK()) {
-    // ctre::phoenix::StatusCode leftStatus = m_leftMotor.GetConfigurator().Apply(leftMotorConfig);
-    // }
-    // while (!rightStatus.IsOK()) {
-    // ctre::phoenix::StatusCode rightStatus = m_rightMotor.GetConfigurator().Apply(rightMotorConfig);
-    // }
 
     frc::SmartDashboard::PutBoolean("/Turret/Shooter/Left Motor Status", leftStatus.IsOK());
     frc::SmartDashboard::PutBoolean("/Turret/Shooter/Right Motor Status", rightStatus.IsOK());

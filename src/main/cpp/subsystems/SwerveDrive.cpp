@@ -38,31 +38,6 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
     // Add a function that loads the Robot Preferences, including
     // offsets, Module positions, max speed, wheel diameter
 
-    // GYRO INITIALIZATION AND FALLBACK LOGIC
-    // auto pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
-    // Try to refresh a few times to be sure
-    // if (pigeonStatus != ctre::phoenix::StatusCode::OK) {
-    //     frc::Wait(0.1_s);
-    //     pigeonStatus = m_pigeon.GetYaw().Refresh().GetStatus();
-    // }
-
-    // if (pigeonStatus == ctre::phoenix::StatusCode::OK) {
-    //     m_usingPigeon = true;
-    //     std::cout << "SwerveDrive: Successfully connected to Pigeon2." << std::endl;
-    //     frc::SmartDashboard::PutString("Gyro Source", "Pigeon");
-    // } else {
-    //     m_usingPigeon = false;
-    //     std::cout << "SwerveDrive: Failed to connect to Pigeon2 (Status: " << pigeonStatus.GetName() << "). Falling back to NavX." << std::endl;
-        
-    //     if (navx.IsConnected()) {
-    //          std::cout << "SwerveDrive: NavX is connected." << std::endl;
-    //          frc::SmartDashboard::PutString("Gyro Source", "NavX");
-    //     } else {
-    //          std::cout << "SwerveDrive: CRITICAL - NavX is ALSO disconnected!" << std::endl;
-    //          frc::SmartDashboard::PutString("Gyro Source", "NONE");
-    //     }
-    // }
-
     kSwerveKinematics = frc::SwerveDriveKinematics<4U>{
         {DriveConstants::kFrontLeftPosition, DriveConstants::kFrontRightPosition,
          DriveConstants::kBackLeftPosition, DriveConstants::kBackRightPosition}};
@@ -164,34 +139,6 @@ SwerveDrive::SwerveDrive(ctre::phoenix6::CANBus canBus)
         m_simTimer.Start();
     }
 }
-
-// void SwerveDrive::InitPreferences()
-// {
-//     frc::Preferences::InitDouble(DriveConstants::kBackLeftOffsetKey,
-//                                  DriveConstants::kBackLeftOffset.Radians().value());
-// }
-
-// void SwerveDrive::GetPrefernces()
-// {
-//     auto kBackLeftOffsetDouble = frc::Preferences::GetDouble(DriveConstants::kBackLeftOffsetKey,
-//                                                              DriveConstants::kBackLeftOffset.Radians().value());
-
-//     modules = std::array<SwerveModule, 4>{
-//         {SwerveModule(ElectricalConstants::kFrontLeftDriveMotorID, ElectricalConstants::kFrontLeftTurnMotorID,
-//                       ElectricalConstants::kFrontLeftEncoderID, DriveConstants::kFrontLeftOffset),
-//          SwerveModule(ElectricalConstants::kFrontRightDriveMotorID, ElectricalConstants::kFrontRightTurnMotorID,
-//                       ElectricalConstants::kFrontRightEncoderID, DriveConstants::kFrontRightOffset),
-//          SwerveModule(ElectricalConstants::kBackLeftDriveMotorID, ElectricalConstants::kBackLeftTurnMotorID,
-//                       ElectricalConstants::kBackLeftEncoderID, frc::Rotation2d(units::radian_t{kBackLeftOffsetDouble})),
-//          SwerveModule(ElectricalConstants::kBackRightDriveMotorID, ElectricalConstants::kBackRightTurnMotorID,
-//                       ElectricalConstants::kBackRightEncoderID, DriveConstants::kBackRightOffset)}};
-
-//     m_poseEstimator = frc::SwerveDrivePoseEstimator<4U>{
-//         kSwerveKinematics,
-//         frc::Rotation2d(units::degree_t{m_pigeon.GetAngle()}),
-//         {modules[0].GetPosition(), modules[1].GetPosition(), modules[2].GetPosition(), modules[3].GetPosition()},
-//         frc::Pose2d()};
-// }
 
 // This method will be called once per scheduler run
 void SwerveDrive::Periodic()
@@ -500,51 +447,6 @@ void SwerveDrive::UpdatePoseEstimate()
     // auto resultStdDev = visionStdDevSub.GetAtomic();
     frc::SmartDashboard::PutBoolean("Vision", false);
 
-    // if (resultStdDev.value.size() > 0)
-    // {
-    //     m_poseEstimator.SetVisionMeasurementStdDevs({resultStdDev.value[0], resultStdDev.value[1], resultStdDev.value[2]});
-    // }
-    // else
-    // {
-    //     m_poseEstimator.SetVisionMeasurementStdDevs({1.0, 1.0, 1.0});
-    // }
-
-    // if (result1.value.size() > 0)
-    // {
-    //     frc::SmartDashboard::PutBoolean("Vision", true);
-
-    //     auto compressedResults = result1.value;
-    //     rotation_q = frc::Quaternion(compressedResults.at(6), compressedResults.at(3),
-    //                                  compressedResults.at(4), compressedResults.at(5));
-
-    //     auto posTranslation = frc::Translation3d(units::meter_t{compressedResults.at(0)},
-    //                                              units::meter_t{compressedResults.at(1)},
-    //                                              units::meter_t{compressedResults.at(2)});
-    //     frc::Pose3d cameraPose = frc::Pose3d(posTranslation, frc::Rotation3d(rotation_q));
-    //     if (poseFilter1.IsPoseValid(cameraPose, compressedResults.at(7)))
-    //     {
-    //         frc::Pose2d visionMeasurement2d = cameraPose.ToPose2d();
-    //         m_poseEstimator.AddVisionMeasurement(visionMeasurement2d,
-    //                                              units::second_t{compressedResults.at(7)});
-    //     }
-    // }
-    // if (result2.value.size() > 0)
-    // {
-    //     auto compressedResults = result2.value;
-    //     rotation_q = frc::Quaternion(compressedResults.at(6), compressedResults.at(3),
-    //                                  compressedResults.at(4), compressedResults.at(5));
-
-    //     auto posTranslation = frc::Translation3d(units::meter_t{compressedResults.at(0)},
-    //                                              units::meter_t{compressedResults.at(1)},
-    //                                              units::meter_t{compressedResults.at(2)});
-    //     frc::Pose3d cameraPose = frc::Pose3d(posTranslation, frc::Rotation3d(rotation_q));
-    //     if (poseFilter2.IsPoseValid(cameraPose, compressedResults.at(7)))
-    //     {
-    //         frc::Pose2d visionMeasurement2d = cameraPose.ToPose2d();
-    //         m_poseEstimator.AddVisionMeasurement(visionMeasurement2d,
-    //                                              units::second_t{compressedResults.at(7)});
-    //     }
-    // }
 }
 
 void SwerveDrive::MakeX(bool make_x){

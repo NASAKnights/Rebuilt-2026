@@ -26,38 +26,7 @@ namespace
     units::degree_t GetRobotVelocityTurretAngleCorrection(frc::Pose2d robotPose, units::degree_t KVTurretAngleCompensation, units::meter_t target_distance)
     {
 
-        // units::radian_t robotAngle = robotPose.Rotation().Radians();
-        // // Get the robot's linear and angular velocity from the swervedrive.
-        // // The linear velocities are oriented relative to the robot, not the field.
-        // auto robotVx = frc::SmartDashboard::GetNumber("drive/vx", 0.0);
-        // auto robotVy = frc::SmartDashboard::GetNumber("drive/vy", 0.0);
-        // auto robotOmega = frc::SmartDashboard::GetNumber("drive/omega", 0.0);
-        // // auto robotVx = units::meters_per_second_t{0.0};
-        // // auto robotVy = units::meters_per_second_t{0.0};
-        // // auto robotOmega = 0.0_rad_per_s;
-
-        // // Reorient robotVx, robotVy to the world reference frame (field)
-        // double robotWorldVx = robotVx * std::cos(robotAngle.value()) -
-        //                                         robotVy * std::sin(robotAngle.value());
-        // double robotWorldVy = robotVx * std::sin(robotAngle.value()) +
-        //                                         robotVy * std::cos(robotAngle.value());
-
-        // std::vector<std::vector<double>> robotWorldTwist = {{robotWorldVx},
-        //                                                     {robotWorldVy},
-        //                                                     {0.0},
-        //                                                     {0.0},
-        //                                                     {0.0},
-        //                                                     {robotOmega}};
-
-        // // Goal in the world frame
-        // Eigen::Matrix3d goalPose = frc::Transform3d(2_m, 2_m, 0.0_m, frc::Rotation3d()).ToMatrix();
-
-        // Eigen::Matrix<double, 6,1> RobotGoalTwist = goalPose.adjoint() * Eigen::Matrix<double,6,1>{robotWorldTwist};
-
-        // //Convert twist to polar coordinates so velocity maintains locked on the hub
-        // //Somehow get turret angle compensation
-
-        // RobotGoalTwist
+       
 
         return KVTurretAngleCompensation;
     }
@@ -140,12 +109,6 @@ Turret::Turret() : m_controller(
         m_magSwitchSim.SetValue(true);
     }
 
-    // if constexpr(frc::RobotBase::IsSimulation())
-    // {
-    //     m_simTimer.Start();
-    // }
-    // const frc::DCMotor, const double, const units::moment_of_inertia::kilogram_square_meter_t, const units::length::meter_t,
-    // const units::angle::radian_t, const units::angle::radian_t, const bool, const units::angle::radian_t, const std::array<double, 1U>)
 }
 
 void Turret::SimulationPeriodic()
@@ -470,13 +433,7 @@ void Turret::ChangeHoodMapValue(double newOffsetValue)
 {
     double distVal = frc::SmartDashboard::GetNumber("/Turret/Ballistics/Target Distance", 0);
 
-    // if (!kHoodOffsetMap.empty()){
-    //     auto itHigh = kHoodOffsetMap.lower_bound(distVal);
-    //     //TODO: Make kMaxHoodAngle and kMinHoodAngle
-    //     if(!itHigh->second + newOffsetValue > 19 || !itHigh->second + newOffsetValue < 0){
-    //         itHigh->second += newOffsetValue;
-    //     }
-    // }
+
 
     m_launchCalculator.AdjustHoodAngleAtDistance(distVal, newOffsetValue);
 }
@@ -570,49 +527,14 @@ void Turret::Periodic()
             frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "soft_max");
             v = units::volt_t(0);
         }
-        // else if (!m_magSwitch.Get() && GetMeasurement().value() < TurretConstants::kmidPoint.convert<units::deg>().value() && v.value() < 0)
-        // {
-        //     frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "min");
-        //     v = units::volt_t(0);
-        // }
-        // else if (!m_magSwitch.Get() && GetMeasurement().value() > TurretConstants::kmidPoint.convert<units::deg>().value() && v.value() > 0)
-        // {
-        //     frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "max");
-        //     v = units::volt_t(0);
-        // }
-
-
-        // else if (!m_magSwitch.Get() && GetMeasurement().value() < TurretConstants::kmidPoint.convert<units::deg>().value())
-        // {
-        //     frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "min");
-        //     v = units::volt_t(0);
-        // }
-        // else if (!m_magSwitch.Get() && GetMeasurement().value() > TurretConstants::kmidPoint.convert<units::deg>().value())
-        // {
-        //     frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "max");
-        //     v = units::volt_t(0);
-        // }
+       
         else
         {
             frc::SmartDashboard::PutString("/Turret/Aim/Stopped", "not");
         }
 
-        // if(!m_magSwitch.Get() && v.value() < 0) {
-        //     // if(v.value() < 0) m_encoder.SetPosition(-45);
-        //     // else m_encoder.SetPosition(45);
-        //     v = units::volt_t(0);
-        // }
-        // else if(!m_magSwitch.Get() && v.value() > 0){
-
-        // }
-
-        // units::degrees_per_second_t robotVel = units::degrees_per_second_t{frc::SmartDashboard::GetNumber("/Turret/Aim/Angular Velocity", 0.0)};
-        // auto turretVel = GetVelocity();
-        // frc::SmartDashboard::PutNumber("/Turret/Aim/Get Measurement", double(GetMeasurement()));
-        // frc::SmartDashboard::PutNumber("/Turret/Aim/Feedforward", double(ff));
+       
         frc::SmartDashboard::PutNumber("/Turret/Aim/Feedback", double(fb));
-        // frc::SmartDashboard::PutNumber("/Turret/Aim/Feedforward Velocity  ", double(velocity));
-
         frc::SmartDashboard::PutNumber("/Turret/Aim/Voltage", double(v));
 
         // Baseline vs lookahead-compensated launch properties for visualization.
@@ -974,17 +896,7 @@ void Turret::UpdateTurretGoal(const frc::Pose2d &robotPose)
     }
     goalPublisher.Set(TurretGoal);
 
-    // elif (Alliance = HubStatus)
-    // {
-    //     //able to shoot
-    //     //switch goal pose to hub
-    // } else {
-    //     //passing
-    //     if (robotPose IsIn bottom)
-    //     {
-    //         //switchgoal bot color
-    //     }
-    // }
+    
 }
 
 frc::Pose2d Turret::CalculateTurretPose(const frc::Pose2d &robotPose)

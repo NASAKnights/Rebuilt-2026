@@ -46,10 +46,7 @@ Wrist::Wrist() : m_controller(
     m_MotorCurrentLog = wpi::log::DoubleLogEntry(log, "/Wrist/MotorCurrent");
     m_MotorVoltageLog = wpi::log::DoubleLogEntry(log, "/Wrist/MotorVoltage");
 
-    // if constexpr(frc::RobotBase::IsSimulation())
-    // {
-    //     m_simTimer.Start();
-    // }
+   
 }
 
 void Wrist::SimulationPeriodic()
@@ -148,16 +145,7 @@ void Wrist::Periodic()
         break;
     }
     }
-    // if (m_motor.GetForwardLimitSwitch().Get())
-    // {
-    //     m_encoder.SetPosition(106.0);
-    //     if (m_WristState == WristConstants::ZEROING)
-    //     {
-    //         // m_goal = 0.1_m;
-    //         m_WristState = WristConstants::HOLD;
-    //         SetAngle(105.0);
-    //     }
-    // }
+    
 }
 
 WristConstants::WristState Wrist::GetState()
