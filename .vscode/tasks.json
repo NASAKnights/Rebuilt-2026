@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install tune_map dependencies",
+      "type": "shell",
+      "command": "python",
+      "args": ["-m", "pip", "install", "-r", "tools/requirements.txt"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Run tune_map",
+      "type": "shell",
+      "command": "python",
+      "args": ["tools/tune_map.py"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "dependsOn": ["Install tune_map dependencies"]
+    }
+  ]
+}
