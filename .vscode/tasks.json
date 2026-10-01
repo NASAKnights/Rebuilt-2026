@@ -4,7 +4,7 @@
     {
       "label": "Install tune_map dependencies",
       "type": "shell",
-      "command": "python",
+      "command": "python3",
       "args": ["-m", "pip", "install", "-r", "tools/requirements.txt"],
       "problemMatcher": [],
       "group": "build"
@@ -12,7 +12,7 @@
     {
       "label": "Run tune_map",
       "type": "shell",
-      "command": "python",
+      "command": "python3",
       "args": ["tools/tune_map.py"],
       "problemMatcher": [],
       "group": {
