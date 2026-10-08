@@ -23,7 +23,7 @@ void BetterHalfRaise::Execute() {
   // units::time::second_t time = m_timer.Get();
 
   
-  if (m_timer.HasElapsed(units::second_t{1.})){
+  if (m_timer.HasElapsed(units::second_t{0.7})){
     if (raise){
       raise = false;
       m_wrist->SetAngle(3.0);

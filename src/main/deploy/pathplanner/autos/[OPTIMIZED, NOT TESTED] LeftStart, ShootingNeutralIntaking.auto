@@ -40,22 +40,9 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.25
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "HalfRaiseIntake"
-                      }
-                    }
-                  ]
+                  "name": "BetterHalfRaise"
                 }
               }
             ]
@@ -97,22 +84,9 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.25
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "HalfRaiseIntake"
-                      }
-                    }
-                  ]
+                  "name": "BetterHalfRaise"
                 }
               }
             ]

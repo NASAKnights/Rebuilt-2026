@@ -34,7 +34,7 @@ void TurretIntake::Periodic()
 void TurretIntake::Intake()
 {
     // m_intakeMotor.Set(ctre::phoenix::motorcontrol::ControlMode::PercentOutput, -0.85);
-    m_intakeMotor.Set(-0.75);
+    m_intakeMotor.Set(-0.78);
 }
 
 void TurretIntake::Outtake()
