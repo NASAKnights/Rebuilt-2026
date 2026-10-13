@@ -180,7 +180,7 @@ namespace ModuleConstants
     const double kSteerPeakCurrentDuration = 0.1;
 
     const bool kDriveEnableCurrentLimit = true;
-    const int kDriveContinuousCurrentLimit = 35;
+    const int kDriveContinuousCurrentLimit = 60;
     const int kDrivePeakCurrentLimit = 80;
     const double kDrivePeakCurrentDuration = 0.1;
 

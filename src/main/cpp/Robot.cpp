@@ -27,7 +27,7 @@ void Robot::RobotInit()
     frc::SmartDashboard::PutString("POIName", "");
     frc::SmartDashboard::PutData("AddPOI", addPOICommand.get());
     frc::SmartDashboard::PutData("RemovePOI", removePOICommand.get());
-    frc::SmartDashboard::PutData("Set", autoWheelOffsetsCommand.get());
+    frc::SmartDashboard::PutData("SetAutoWheelOffsets", autoWheelOffsetsCommand.get());
     frc::SmartDashboard::PutNumber("hoodAngle", 1.0);
     
     try
@@ -204,12 +204,43 @@ void Robot::CreateRobot()
     pathplanner::NamedCommands::registerCommand("NoShoot", Shoot(&m_turret, false).ToPtr());
     pathplanner::NamedCommands::registerCommand("BetterHalfRaise", BetterHalfRaise(&m_intake, &m_wrist).ToPtr());
 
-    m_swerveDrive.SetDefaultCommand(frc2::RunCommand(
+    // m_swerveDrive.SetDefaultCommand(frc2::RunCommand(
+    //     [this]
+    //     {
+    //         auto controllerIn = m_driverController.GetRawButton(4);
+    //         // bool approach = 0;
+
+    //         auto leftXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(1),
+    //                                                    DriveConstants::kDefaultAxisDeadband);
+    //         auto leftYAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(0),
+    //                                                    DriveConstants::kDefaultAxisDeadband);
+    //         auto rightXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(4),
+    //                                                     DriveConstants::kDefaultAxisDeadband);
+
+    //         // m_swerveDrive.WeightedDriving(approach, leftXAxis, leftYAxis, rightXAxis, targetKey);
+
+    //         if (controllerIn)
+    //             // Robot-Oriented Drive
+    //             m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+    //                 -leftXAxis * 1.0_mps,
+    //                 -leftYAxis * 1.0_mps,
+    //                 -rightXAxis * 2.0_rad_per_s, m_swerveDrive.GetHeading()));
+    //         else
+    //         {
+    //             m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+    //                 -leftXAxis * DriveConstants::kMaxTranslationalVelocity,
+    //                 -leftYAxis * DriveConstants::kMaxTranslationalVelocity,
+    //                 -rightXAxis * DriveConstants::kMaxRotationalVelocity, m_swerveDrive.GetHeading()));
+    //         }
+    //     },
+    //     {&m_swerveDrive}));
+
+            m_swerveDrive.SetDefaultCommand(frc2::RunCommand(
         [this]
         {
             auto controllerIn = m_driverController.GetRawButton(4);
-            // bool approach = 0;
 
+            // 1. Get deadbanded raw inputs from your MathUtilNK utility
             auto leftXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(1),
                                                        DriveConstants::kDefaultAxisDeadband);
             auto leftYAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(0),
@@ -217,20 +248,42 @@ void Robot::CreateRobot()
             auto rightXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(4),
                                                         DriveConstants::kDefaultAxisDeadband);
 
-            // m_swerveDrive.WeightedDriving(approach, leftXAxis, leftYAxis, rightXAxis, targetKey);
+            // 2. Calculate the translation vector magnitude (distance from center joystick deadzone)
+            double magnitude = std::hypot(leftXAxis, leftYAxis);
 
+            // 3. Initialize final outputs
+            double finalX = 0.0;
+            double finalY = 0.0;
+
+            if (magnitude > 0.0) {
+                // Apply a cubic curve to the magnitude. You can change the exponent to 2.0 (quadratic) 
+                // if drivers find 3.0 too slow near the center.
+                double a = 1.0; // 0.0 is completely linear, 1.0 is full cubic curve
+                double curvedMagnitude = a * std::pow(magnitude, 3.0) + (1.0 - a) * magnitude;
+
+                
+                // Rescale the original directional components using the curved ratio
+                double scale = curvedMagnitude / magnitude;
+                finalX = leftXAxis * scale;
+                finalY = leftYAxis * scale;
+            }
+
+            // 4. Curve the rotation joystick independently (Optional, but gives smoother turning)
+                double finalRotation = std::copysign(std::pow(std::abs(rightXAxis), 3.0), rightXAxis); 
+
+            // 5. Pass curved inputs into your drive functions
             if (controllerIn)
                 // Robot-Oriented Drive
                 m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                    -leftXAxis * 1.0_mps,
-                    -leftYAxis * 1.0_mps,
-                    -rightXAxis * 2.0_rad_per_s, m_swerveDrive.GetHeading()));
+                    -finalX * 1.0_mps,
+                    -finalY * 1.0_mps,
+                    -finalRotation * 2.0_rad_per_s, m_swerveDrive.GetHeading()));
             else
             {
                 m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                    -leftXAxis * DriveConstants::kMaxTranslationalVelocity,
-                    -leftYAxis * DriveConstants::kMaxTranslationalVelocity,
-                    -rightXAxis * DriveConstants::kMaxRotationalVelocity, m_swerveDrive.GetHeading()));
+                    -finalX * DriveConstants::kMaxTranslationalVelocity,
+                    -finalY * DriveConstants::kMaxTranslationalVelocity,
+                    -finalRotation * DriveConstants::kMaxRotationalVelocity, m_swerveDrive.GetHeading()));
             }
         },
         {&m_swerveDrive}));
