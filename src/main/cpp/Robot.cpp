@@ -235,10 +235,11 @@ void Robot::CreateRobot()
     //     },
     //     {&m_swerveDrive}));
 
-            m_swerveDrive.SetDefaultCommand(frc2::RunCommand(
+           m_swerveDrive.SetDefaultCommand(frc2::RunCommand(
         [this]
         {
-            auto controllerIn = m_driverController.GetRawButton(4);
+            // Rename for clarity: button 4 controls the orientation mode
+            bool isRobotOriented = m_driverController.GetRawButton(4); 
 
             // 1. Get deadbanded raw inputs from your MathUtilNK utility
             auto leftXAxis = MathUtilNK::calculateAxis(m_driverController.GetRawAxis(1),
@@ -255,38 +256,48 @@ void Robot::CreateRobot()
             double finalX = 0.0;
             double finalY = 0.0;
 
-            if (magnitude > 0.0) {
-                // Apply a cubic curve to the magnitude. You can change the exponent to 2.0 (quadratic) 
-                // if drivers find 3.0 too slow near the center.
+            // Use a small epsilon to prevent division by zero or extreme scaling math near 0
+            if (magnitude > 1e-5) {
+                // Apply tunable cubic curve to the magnitude
                 double a = 1.0; // 0.0 is completely linear, 1.0 is full cubic curve
-                double curvedMagnitude = a * std::pow(magnitude, 3.0) + (1.0 - a) * magnitude;
+                double curvedMagnitude = a * std::pow(magnitude, 2.0) + (1.0 - a) * magnitude;
 
-                
                 // Rescale the original directional components using the curved ratio
                 double scale = curvedMagnitude / magnitude;
                 finalX = leftXAxis * scale;
                 finalY = leftYAxis * scale;
             }
 
-            // 4. Curve the rotation joystick independently (Optional, but gives smoother turning)
-                double finalRotation = std::copysign(std::pow(std::abs(rightXAxis), 3.0), rightXAxis); 
+            // 4. Curve the rotation joystick independently using a signed cubic power
+            double finalRotation = std::copysign(std::pow(std::abs(rightXAxis), 3.0), rightXAxis); 
 
-            // 5. Pass curved inputs into your drive functions
-            if (controllerIn)
-                // Robot-Oriented Drive
+            // 5. Convert joystick percentages (-1.0 to 1.0) into physical velocities
+            units::velocity::meters_per_second_t targetX;
+            units::velocity::meters_per_second_t targetY;
+            units::angular_velocity::radians_per_second_t targetRotation;
+
+            if (isRobotOriented) {
+                // Precision / Robot-Oriented scaling (using lower fixed max values for fine control)
+                targetX = -finalX * 1.0_mps;
+                targetY = -finalY * 1.0_mps;
+                targetRotation = -finalRotation * 2.0_rad_per_s;
+
+                // FIX: Use raw ChassisSpeeds for Robot-Oriented drive
+                m_swerveDrive.Drive(frc::ChassisSpeeds{targetX, targetY, targetRotation});
+            }
+            else {
+                // Standard Field-Oriented scaling
+                targetX = -finalX * DriveConstants::kMaxTranslationalVelocity;
+                targetY = -finalY * DriveConstants::kMaxTranslationalVelocity;
+                targetRotation = -finalRotation * DriveConstants::kMaxRotationalVelocity;
+
+                // Field-Oriented drive
                 m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                    -finalX * 1.0_mps,
-                    -finalY * 1.0_mps,
-                    -finalRotation * 2.0_rad_per_s, m_swerveDrive.GetHeading()));
-            else
-            {
-                m_swerveDrive.Drive(frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                    -finalX * DriveConstants::kMaxTranslationalVelocity,
-                    -finalY * DriveConstants::kMaxTranslationalVelocity,
-                    -finalRotation * DriveConstants::kMaxRotationalVelocity, m_swerveDrive.GetHeading()));
+                    targetX, targetY, targetRotation, m_swerveDrive.GetHeading()));
             }
         },
         {&m_swerveDrive}));
+
 
 
     AddPeriodic([this]
